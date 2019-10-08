@@ -1,8 +1,9 @@
 import cheerio from 'cheerio'
 import Nightmare from 'nightmare'
-import { IFlightSearchParams, FlightStops } from 'data/models/flightSearchParams'
 import logger from 'config/winston'
-import { formatDateAsKebab } from 'data/dateProcessor'
+import { IFlightSearchParams } from 'data/flight/search/params'
+import { formatDateAsKebab } from 'data/date/formatter'
+import { FlightStops } from 'data/flight/stops'
 
 export async function kayakFlights(params: IFlightSearchParams) {
   const processStartTime = process.hrtime()

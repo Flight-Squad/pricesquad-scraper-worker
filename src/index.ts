@@ -17,18 +17,23 @@ const app = Consumer.create({
       // console.log(message);
       // console.log(data);
 
-      scrape(data).catch(e => logger.error(e.message));
+      try {
+        const res = await scrape(data);
+        logger.info(JSON.stringify(res));
+      } catch (e) {
+        logger.error(e.message);
+      }
     }
   }
 });
 
 app.on("error", err => {
-  console.error(err.message);
+  logger.error(err.message);
 });
 
 app.on("processing_error", err => {
-  console.error(err.message);
+  logger.error(err.message);
 });
 
-console.log('Starting app...')
+logger.info('Starting app...')
 app.start();

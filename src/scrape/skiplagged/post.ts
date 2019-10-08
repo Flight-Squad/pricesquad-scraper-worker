@@ -1,8 +1,8 @@
 import cheerio from "cheerio";
 import Nightmare from "nightmare";
-import { IFlightSearchParams } from "data/models/flightSearchParams";
-import { formatDateAsKebab } from "data/dateProcessor";
 import logger from "config/winston";
+import { IFlightSearchParams } from "data/flight/search/params";
+import { formatDateAsKebab } from "data/date/formatter";
 
 // Auto sorts by cheapest price, so do we really need to keep scrolling?
 // Maybe for flight from cheapest provider
