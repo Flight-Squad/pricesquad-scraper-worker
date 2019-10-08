@@ -1,5 +1,3 @@
-// TODO verb-alize this formatter
-
 /**
  * Take ISO String (from `date`) like `'2011-10-05T14:48:00.000Z'`
  *
@@ -20,4 +18,3 @@ export function convertHrTimeToNanos(time: [number, number]) {
 // Keeping these commented out to move into tests later
 // expected output: yyyy-mm-dd
 // console.log(dateFormat.googleFlights(new Date()));
-
