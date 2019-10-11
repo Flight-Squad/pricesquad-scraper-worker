@@ -3,7 +3,7 @@
   "Volumes": [
     {
       "HostDirectory": "/var/app",
-      "ContainerDirectory": "/usr/src/app"
+      "ContainerDirectory": "/var/app"
     }
   ],
   "Logging": "/var/app/logs"

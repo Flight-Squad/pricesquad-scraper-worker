@@ -74,9 +74,9 @@ ADD rootfs /
 # EXPOSE doesn't actually expose the port, and it could confuse some cloud providers
 EXPOSE 80
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-ADD . /usr/src/app
+RUN mkdir -p /var/app
+WORKDIR /var/app
+ADD . /var/app
 
 RUN yarn install
 RUN chmod 777 /startup.sh
