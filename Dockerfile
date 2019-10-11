@@ -80,7 +80,7 @@ ADD . /var/app
 
 RUN yarn install
 RUN chmod 777 /startup.sh
-RUN ls -al /
+# RUN ls -al /
 RUN /startup.sh
 CMD [ "npm", "run", "docker" ]
 # ENV HOME=/home/ubuntu \
