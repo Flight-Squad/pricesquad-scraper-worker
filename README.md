@@ -10,6 +10,8 @@ Create `.env` file at project root, see engineering wiki for variables
 
 # Ajit Todo
 
+Please create a branch called `ajitm/logfmt`
+
 1. Convert logs to canonical log lones (aka logfmt) to make logs more readable
 
 Current log line looks like
