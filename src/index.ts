@@ -14,12 +14,13 @@ const app = Consumer.create({
   handleMessageBatch: async (messages: SQSMessage[]) => {
     for (let message of messages) {
       const data = JSON.parse(message.Body);
+      logger.debug(JSON.stringify(data));
       // console.log(message);
       // console.log(data);
 
       try {
         const res = await scrape(data);
-        logger.info(JSON.stringify(res));
+        logger.info(JSON.stringify({requestId: data.params.requestId, res: res,}));
       } catch (e) {
         logger.error(e.message);
       }

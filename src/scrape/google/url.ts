@@ -1,8 +1,8 @@
-import { IMessageBody } from "data/queue/message/body";
 import { formatDateAsKebab } from "data/date/formatter";
 import { FlightStops } from "data/flight/stops";
+import { IMessageBodyParams } from "data/queue/message/params";
 
-async function makeUrl(params: IMessageBody): Promise<string> {
+async function makeUrl(params: IMessageBodyParams): Promise<string> {
   const departDate = formatDateAsKebab(new Date(params.departDate));
   const returnDate = params.returnDate ? formatDateAsKebab(new Date(params.returnDate)) : '';
   const roundTripQuery = makeRoundTripQuery(params.isRoundTrip, params.origin, params.dest, returnDate);

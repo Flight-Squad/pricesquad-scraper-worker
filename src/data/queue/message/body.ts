@@ -1,12 +1,8 @@
 import { FlightStops } from "data/flight/stops";
 import { SearchProviders } from "data/flight/search/providers";
+import { IMessageBodyParams } from "./params";
 
 export interface IMessageBody {
-  origin: string;
-  dest: string;
-  departDate: string;
-  returnDate?: string;
-  isRoundTrip: boolean;
-  numStops: FlightStops;
+  params: IMessageBodyParams;
   provider: SearchProviders;
 }

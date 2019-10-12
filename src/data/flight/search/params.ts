@@ -1,5 +1,5 @@
 import { FlightStops } from "../stops";
-import { IMessageBody } from "data/queue/message/body";
+import { IMessageBodyParams } from "data/queue/message/params";
 var moment = require('moment');
 
 export interface IFlightSearchParams {
@@ -16,7 +16,7 @@ export interface IFlightSearchParams {
  *
  * @param data
  */
-export function makeFlightSearchParams(data: IMessageBody): IFlightSearchParams {
+export function makeFlightSearchParams(data: IMessageBodyParams): IFlightSearchParams {
   const params: any = {
     origin: data.origin,
     dest: data.dest,
