@@ -7,4 +7,5 @@ export interface IMessageBodyParams {
   returnDate?: string;
   isRoundTrip: boolean;
   numStops: FlightStops;
+  requestId?: string;
 }
