@@ -19,7 +19,7 @@ const app = Consumer.create({
 
       // Commented out because this can/should be handled more succinctly and scalably
       // if (process.env.NODE_ENV === 'debug' || process.env.NODE_ENV === 'development') {
-      //   logger.debug(JSON.stringify(data));
+        logger.debug(`Received Request ${data.params.requestId}`);
       // }
 
       try {
