@@ -14,6 +14,7 @@ const app = Consumer.create({
   queueUrl: AwsConfig.QueueUrl,
   region: AwsConfig.Region,
   handleMessage: handleMessage,
+  pollingWaitTimeMs: 700,
 });
 
 app.on("error", err => {
