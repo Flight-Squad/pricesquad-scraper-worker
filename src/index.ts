@@ -13,11 +13,7 @@ const { Consumer } = require("sqs-consumer");
 const app = Consumer.create({
   queueUrl: AwsConfig.QueueUrl,
   region: AwsConfig.Region,
-  handleMessageBatch: async (messages: SQSMessage[]) => {
-    for (let message of messages) {
-      await handleMessage(message);
-    } // end for-loop
-  } // end handleMessageBatch
+  handleMessage: handleMessage,
 });
 
 app.on("error", err => {
