@@ -10,11 +10,13 @@ type SQSMessage = SQS.Types.Message;
 
 const { Consumer } = require("sqs-consumer");
 
+// https://github.com/bbc/sqs-consumer
 const app = Consumer.create({
   queueUrl: AwsConfig.QueueUrl,
   region: AwsConfig.Region,
   handleMessage: handleMessage,
   pollingWaitTimeMs: 700,
+  visibilityTimeout: 100,
 });
 
 app.on('stopped', () => {
