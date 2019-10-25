@@ -31,8 +31,8 @@ const app = Consumer.create({
           requestId: data.params.requestId,
         };
         await axios.post(postUrl, postBody);
-
-        logger.info(JSON.stringify({requestId: data.params.requestId, res: res,}));
+        logger.info(`Processed Request ${data.params.requestId}`)
+        // logger.info(JSON.stringify({requestId: data.params.requestId, res: res,}));
       } catch (e) {
         logger.error(e.message);
       }
