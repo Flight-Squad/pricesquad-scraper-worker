@@ -17,6 +17,13 @@ const app = Consumer.create({
   pollingWaitTimeMs: 700,
 });
 
+app.on('stopped', () => {
+  app.start();
+})
+
+app.on('empty', () => {
+  logger.info('Queue is Empty, All messages have been processed')
+})
 app.on("error", err => {
   logger.error(err.message);
 });
