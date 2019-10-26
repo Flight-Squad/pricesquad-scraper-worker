@@ -19,7 +19,7 @@ const app = Consumer.create({
       await handleMessage(message);
     }
   },
-  batchSize: 2,
+  // batchSize: 2,
   pollingWaitTimeMs: 700,
   visibilityTimeout: 100,
 });
