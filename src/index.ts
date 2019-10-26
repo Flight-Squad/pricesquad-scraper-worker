@@ -20,8 +20,8 @@ const app = Consumer.create({
     }
   },
   // batchSize: 2,
-  pollingWaitTimeMs: 700,
-  visibilityTimeout: 100,
+  // pollingWaitTimeMs: 700,
+  // visibilityTimeout: 100,
 });
 
 app.on('stopped', () => {
