@@ -19,9 +19,9 @@ const app = Consumer.create({
       await handleMessage(message);
     }
   },
-  // batchSize: 2,
-  // pollingWaitTimeMs: 700,
-  // visibilityTimeout: 100,
+  batchSize: 4,
+  pollingWaitTimeMs: 500,
+  visibilityTimeout: 100,
 });
 
 app.on('stopped', () => {
