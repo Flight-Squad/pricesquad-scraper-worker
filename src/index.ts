@@ -32,7 +32,7 @@ app.on('empty', () => {
   logger.info('Queue is Empty, All messages have been processed')
 })
 app.on("error", err => {
-  logger.error(err.message);
+  console.error(err);
 });
 
 app.on("processing_error", err => {
