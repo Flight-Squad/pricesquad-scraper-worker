@@ -6,6 +6,7 @@ import { scrape } from "scrape";
 import logger from "config/winston";
 import axios from "axios";
 import { PRICESQUAD_API } from "config/pricesquad.api";
+import express from 'express';
 type SQSMessage = SQS.Types.Message;
 
 const { Consumer } = require("sqs-consumer");
@@ -68,3 +69,12 @@ async function handleMessage(message: SQSMessage) {
     logger.error(e.message);
   }
 }
+
+// Trying to fix err conn refused on port 80
+const expressApp = express();
+
+expressApp.get('/', (req, res) => res.send('hi'));
+expressApp.post('/', (req, res) => res.send(201));
+
+expressApp.listen(80);
+
