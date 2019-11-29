@@ -62,7 +62,7 @@ async function handleMessage(message: SQSMessage) {
       requestId,
       sessionId,
     };
-    logger.debug(`Posting to ${postUrl}`, {url: postUrl, ...postBody});
+
     await axios.post(postUrl, postBody);
     logger.info(`Processed Request ${requestName}`);
     // logger.info(JSON.stringify({requestId: data.params.requestId, res: res,}));
