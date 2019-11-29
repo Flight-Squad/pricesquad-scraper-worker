@@ -62,6 +62,7 @@ async function handleMessage(message: SQSMessage) {
       requestId,
       sessionId,
     };
+    logger.debug(`Posting to ${postUrl}`, {url: postUrl, ...postBody});
     await axios.post(postUrl, postBody);
     logger.info(`Processed Request ${requestName}`);
     // logger.info(JSON.stringify({requestId: data.params.requestId, res: res,}));
@@ -70,7 +71,7 @@ async function handleMessage(message: SQSMessage) {
   }
 }
 
-// Trying to fix err conn refused on port 80
+// Fix err conn refused on port 80
 const expressApp = express();
 
 expressApp.get('/', (req, res) => res.send('hi'));
