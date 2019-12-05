@@ -23,20 +23,6 @@ jobs:
         image_name: flight-squad/pricesquad-scraper-worker/app
         image_tag: ${{ github.sha }}
 
-
-    - name: Build Container Image
-      run: docker build . -t docker.pkg.github.com/
-
-    - name: Login to Docker Package Registry
-      uses: azure/docker-login@v1
-      with:
-        login-server: docker.pkg.github.com
-        username: ${{ secrets.GH_REGISTRY_USERNAME }}
-        password: ${{ secrets.GH_TOKEN }}
-
-    - name: Push to Package Reg
-      run: docker push docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:${{ github.sha }}
-
     - name: Update deployment file
       run: TAG=${{ github.sha }} && sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
 
@@ -50,9 +36,9 @@ jobs:
     - name: Deploy to DigitalOcean Kubernetes
       uses: docker://lachlanevenson/k8s-kubectl
       with:
-        args: --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig apply -f $GITHUB_WORKSPACE/kube/deployment.yaml
+        args: --kubeconfig=/github/workspace/.kubeconfig apply -f /github/workspace/kube/deployment.yaml
 
     - name: Verify deployment
       uses: docker://lachlanevenson/k8s-kubectl
       with:
-        args: --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig rollout status deployment/pricesquad-scraper-worker
+        args: --kubeconfig=/github/workspace/.kubeconfig rollout status deployment/pricesquad-scraper-worker
