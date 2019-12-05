@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pricesquad-scraper-worker
+  namespace: default
+  labels:
+    app: pricesquad-scraper-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pricesquad-scraper-worker
+  template:
+    metadata:
+      labels:
+        app: pricesquad-scraper-worker
+    spec:
+      containers:
+        - name: pricesquad-scraper-worker
+          image: <IMAGE>
+          ports:
+            - containerPort: 80
+              name: http
+      imagePullSecrets:
+        - name: github_regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pricesquad-scraper-worker
+  namespace: default
+  labels:
+    app: pricesquad-scraper-worker
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      name: http
+  selector:
+    app: pricesquad-scraper-worker

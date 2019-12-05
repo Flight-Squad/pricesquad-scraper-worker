@@ -1,7 +1,11 @@
 node_modules/
 logs/
 bin/
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-.git
+kube/
+# Elastic Beanstalk Files
+
+.elasticbeanstalk/*
+
+.git
+
 .gitignore
