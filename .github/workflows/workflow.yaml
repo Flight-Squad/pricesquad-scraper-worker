@@ -28,21 +28,21 @@ jobs:
       run: docker push docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:${{ github.sha }}
 
     - name: Update deployment file
-      run: TAG=${{ github.sha }} && sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/pricesquad-scraper-worker/kube/deployment.yaml
+      run: TAG=${{ github.sha }} && sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
 
     - name: Save DigitalOcean kubeconfig
       uses: digitalocean/action-doctl@v1.4.1
       env:
         DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       with:
-        args: kubernetes cluster kubeconfig show k8s-pricesquad-do-0-nyc1 > $GITHUB_WORKSPACE/pricesquad-scraper-worker/.kubeconfig
+        args: kubernetes cluster kubeconfig show k8s-pricesquad-do-0-nyc1 > $GITHUB_WORKSPACE/.kubeconfig
 
     - name: Deploy to DigitalOcean Kubernetes
       uses: docker://lachlanevenson/k8s-kubectl
       with:
-        args: --kubeconfig=$GITHUB_WORKSPACE/pricesquad-scraper-worker/.kubeconfig apply -f $GITHUB_WORKSPACE/pricesquad-scraper-worker/kube/deployment.yaml
+        args: --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig apply -f $GITHUB_WORKSPACE/kube/deployment.yaml
 
     - name: Verify deployment
       uses: docker://lachlanevenson/k8s-kubectl
       with:
-        args: --kubeconfig=$GITHUB_WORKSPACE/pricesquad-scraper-worker/.kubeconfig rollout status deployment/pricesquad-scraper-worker
+        args: --kubeconfig=$GITHUB_WORKSPACE/.kubeconfig rollout status deployment/pricesquad-scraper-worker
