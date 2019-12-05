@@ -24,7 +24,13 @@ jobs:
         image_tag: ${{ github.sha }}
 
     - name: Update deployment file
-      run: TAG=${{ github.sha }} && sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+      run: |
+        TAG=${{ github.sha }} && sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+        AWS_KEY=${{ secrets.AWS_ACCESS_KEY_ID  }} && sed -i 's|<AWS_KEY>|'${AWS_KEY}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+        AWS_SECRET=${{ secrets.AWS_SECRET_ACCESS_KEY  }} && sed -i 's|<AWS_SECRET_KEY>|'${AWS_SECRET}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+        PRICESQUAD=${{ secrets.PRICESQUAD_API  }} && && sed -i 's|<PRICESQUAD_API>|'${PRICESQUAD}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+        AWS_QUEUE=${{ secrets.AWS_QUEUE  }} && && sed -i 's|<AWS_QUEUE>|'${AWS_QUEUE}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+        AWS_QUEUE_REGION=${{ secrets.AWS_QUEUE_REGION  }} && && sed -i 's|<AWS_QUEUE_REGION>|'${AWS_QUEUE_REGION}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
 
     - name: Save DigitalOcean kubeconfig
       uses: digitalocean/action-doctl@v1.4.1

@@ -8,6 +8,10 @@ Prerequisites:
 
 Create `.env` file at project root, see engineering wiki for variables
 
+# NOTE
+
+Change PRICESQUAD_API gh Actions secret once prod server is ready
+
 # Troubleshooting
 
 ## Kubernetes
