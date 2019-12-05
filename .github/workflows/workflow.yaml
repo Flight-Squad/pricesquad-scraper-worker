@@ -26,6 +26,8 @@ jobs:
 
     - name: Push image to Container Registry
       run: docker push docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:${{ github.sha }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: Update deployment file
       run: TAG=${{ github.sha }} && sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/pricesquad-scraper-worker/kube/deployment.yaml
