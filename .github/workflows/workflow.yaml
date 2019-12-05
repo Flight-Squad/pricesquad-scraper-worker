@@ -14,8 +14,18 @@ jobs:
     - name: Checkout master
       uses: actions/checkout@v1
 
+    - name: Build and Deploy Container Image
+      uses: whoan/docker-build-with-cache-action@v2
+      with:
+        username: ${{ secrets.GH_REGISTRY_USERNAME }}
+        password: ${{ secrets.GH_TOKEN }}
+        registry: docker.pkg.github.com
+        image_name: flight-squad/pricesquad-scraper-worker/app
+        image_tag: ${{ github.sha }}
+
+
     - name: Build Container Image
-      run: docker build . -t docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:${{ github.sha }}
+      run: docker build . -t docker.pkg.github.com/
 
     - name: Login to Docker Package Registry
       uses: azure/docker-login@v1
