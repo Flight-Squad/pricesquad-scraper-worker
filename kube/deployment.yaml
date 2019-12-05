@@ -22,7 +22,7 @@ spec:
             - containerPort: 80
               name: http
       imagePullSecrets:
-        - name: github_regcred
+        - name: github-regcred
 
 ---
 apiVersion: v1

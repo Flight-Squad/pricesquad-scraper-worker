@@ -1,0 +1,48 @@
+name: Deploy to kubernetes
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  build:
+    name: Build, push, and deploy
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout master
+      uses: actions/checkout@v1
+
+    - name: Login to Docker Package Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: ${{ secrets.GH_REGISTRY_USERNAME }}
+        password: ${{ secrets.GH_REGISTRY_PASSWORD }}
+
+    - name: Build Container Image
+      run: docker build . -t docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:${{ github.sha }}
+
+    - name: Push image to Container Registry
+      run: docker push docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:${{ github.sha }}
+
+    - name: Update deployment file
+      run: TAG=${{ github.sha }} && sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/pricesquad-scraper-worker/kube/deployment.yaml
+
+    - name: Save DigitalOcean kubeconfig
+      uses: digitalocean/action-doctl@v1.4.1
+      env:
+        DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      with:
+        args: kubernetes cluster kubeconfig show k8s-pricesquad-do-0-nyc1 > $GITHUB_WORKSPACE/pricesquad-scraper-worker/.kubeconfig
+
+    - name: Deploy to DigitalOcean Kubernetes
+      uses: docker://lachlanevenson/k8s-kubectl
+      with:
+        args: --kubeconfig=$GITHUB_WORKSPACE/pricesquad-scraper-worker/.kubeconfig apply -f $GITHUB_WORKSPACE/pricesquad-scraper-worker/kube/deployment.yaml
+
+    - name: Verify deployment
+      uses: docker://lachlanevenson/k8s-kubectl
+      with:
+        args: --kubeconfig=$GITHUB_WORKSPACE/pricesquad-scraper-worker/.kubeconfig rollout status deployment/pricesquad-scraper-worker
