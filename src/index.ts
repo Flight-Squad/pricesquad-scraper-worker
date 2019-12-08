@@ -45,12 +45,12 @@ app.start();
 
 async function handleMessage(message: SQSMessage) {
   const data = JSON.parse(message.Body);
-  const { requestId, sessionId, provider } = data;
-  const requestName = `${sessionId}#${requestId}`;
+  const { tripId, sessionId, provider, docPath } = data;
+  const requestId = {tripId, sessionId, provider, docPath};
 
   // Commented out because this can/should be handled more succinctly and scalably
   // if (process.env.NODE_ENV === 'debug' || process.env.NODE_ENV === 'development') {
-  logger.debug(`Received Request ${requestName}`);
+  logger.debug('Received Request', requestId);
   // }
 
   try {
@@ -59,12 +59,13 @@ async function handleMessage(message: SQSMessage) {
     const postBody = {
       results: res,
       provider,
-      requestId,
+      tripId,
       sessionId,
+      docPath,
     };
 
     await axios.post(postUrl, postBody);
-    logger.info(`Processed Request ${requestName}`);
+    logger.info('Processed Request', requestId);
     // logger.info(JSON.stringify({requestId: data.params.requestId, res: res,}));
   } catch (e) {
     logger.error(e.message);
