@@ -3,7 +3,7 @@ import { getHtml } from "scrape/southwest/html";
 import makeUrl from "scrape/southwest/url";
 import { getDepartingTrips, getReturningTrips } from "./scrape";
 
-export async function southwestFlights(params: IFlightSearchParams) {
+export async function scrapeSouthwest(params: IFlightSearchParams) {
   const processStartTime = process.hrtime();
   const url = await makeUrl(params);
   const html = await getHtml(url);
