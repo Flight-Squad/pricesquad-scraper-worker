@@ -8,24 +8,33 @@ import { FlightStops } from 'data/flight/stops'
 export async function kayakFlights(params: IFlightSearchParams) {
   const processStartTime = process.hrtime()
   const nightmare = new Nightmare()
+  // 'Create URL' logic
   const roundTripQuery = makeRoundTripQuery(params);
   const stopsQuery = makeStopsQuery(params);
   const departDate = formatDateAsKebab(params.departDate);
   const url = `https://www.kayak.com/flights/${params.origin}-${params.dest}/${departDate}${roundTripQuery}?sort=price_a${stopsQuery}`
-  const sel = 'div[class*="card"]';
 
-  logger.info(url);
+  // 'Retrieve HTML' Logic
+
+  // -- Unused, but kept as a simple example
+  const sel = 'div[class*="card"]'; // selector string - class name contains 'card'
 
   const listContainer = await nightmare
+  // Mimick a desktop browser - prevent rate limiting from Kayak
+  // This should be the first thing you try to circumvent rate limiting
     .header('user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36')
     .goto(url)
     .wait('.Flights-Results-FlightResultsList')
     .evaluate(() => document.querySelector('.Flights-Results-FlightResultsList').outerHTML)
     .end();
 
+    // 'Scrape HTML' Logic
+
     const scraper = cheerio.load(listContainer);
     const prices = [], flightNumbers = [], stops = [], durations = [], airlines = [];
 
+    // Sometimes, providers obscure class names with generated text
+    // However, they usually contain a consistent string -> select based on that
     scraper('div[class*="Flights-Results-FlightResultItem"]').each(function (i, elem) {
       scraper(this).find('.resultInner').find('.section.times').find('.bottom').each(function (i, elem) {
         airlines.push(scraper(this).text())
@@ -47,10 +56,7 @@ export async function kayakFlights(params: IFlightSearchParams) {
       prices.push(scraper(this).find('.above-button').find('.price.option-text').text().trim());
 
     })
-    // console.log(airlines);
-    // console.log(durations);
-    // console.log(stops);
-    // console.log(prices);
+
     const trips = makeAggregatorTripsData(prices, stops, airlines, durations);
     const processEndTime = process.hrtime(processStartTime);
 
