@@ -5,10 +5,10 @@ export async function getHtml(url: string) {
   //Throws an exception if the .wait() didn't return true within the set timeframe - defualt is 30 secs
 
   return nightmare
-    .goto(url)
-    .wait(".time--period")
-    .evaluate(
-      () => document.querySelector(".search-results--container").outerHTML
-    )
-    .end();
+  .goto(url)
+  .wait(".trip-duration")
+  .evaluate(() => document.querySelector(".infinite-trip-list").outerHTML)
+  .end();
+
+
 }

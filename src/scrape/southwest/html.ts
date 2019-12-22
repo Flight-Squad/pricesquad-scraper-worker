@@ -8,7 +8,6 @@ export async function getHtml(url: string) {
     .goto(url)
     .wait(".time--period")
     .evaluate(
-      () => document.querySelector(".search-results--container").outerHTML
-    )
+      () => document.querySelector(".search-results--container").outerHTML)
     .end();
 }

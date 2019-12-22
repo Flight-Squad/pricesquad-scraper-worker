@@ -9,11 +9,7 @@ export async function getDepartingTrips(html) {
   const trips = [];
   const scraper = cheerio.load(html);
 
-  scraper(".air-booking-select-price-matrix")
-    .filter(function(i, el) {
-      return scraper(this).attr("id") === "air-booking-product-0";
-    })
-    .each((i, elem) => parseTrips(i, elem, trips));
+  scraper(this).each((i, elem) => parseTrips(i, elem, trips));
 
   console.log(trips.length);
   return trips;
@@ -44,14 +40,14 @@ export async function getReturningTrips(html) {
  */
 function parseTrips(i, elem, trips) {
   const scraper = cheerio.load(elem);
-  scraper("ul").each(function(i, elem) {
+  scraper(this).each(function(i, elem) {
     scraper(this)
-      .find("li")
+      .find(".trips")
       .each(function(i, elem) {
         const trip: any = { times: {} };
 
         trip.times.depart = scraper(this)
-          .find(".air-operations-time-status")
+          .find(".trip-path-point-time ")
           .filter(function(i, el) {
             return scraper(this).attr("type") === "origination";
           })
@@ -59,7 +55,7 @@ function parseTrips(i, elem, trips) {
           .trim();
 
         trip.times.arrival = scraper(this)
-          .find(".air-operations-time-status")
+          .find(".trip-path-point-last")
           .filter(function(i, el) {
             return scraper(this).attr("type") === "destination";
           })
@@ -67,17 +63,17 @@ function parseTrips(i, elem, trips) {
           .trim();
 
         trip.duration = scraper(this)
-          .find(".flight-stops--duration-time")
+          .find(".trip-path-duration")
           .text()
           .trim();
 
         trip.stops = scraper(this)
-          .find(".flight-stops-badge")
+          .find(".trip-stops")
           .text()
           .trim();
 
         trip.price = scraper(this)
-          .find(".fare-button--value-total")
+          .find(".trip-cost")
           .last()
           .text();
 

@@ -1,9 +1,9 @@
 import { IFlightSearchParams } from "data/flight/search/params";
-import { getHtml } from "scrape/southwest/html";
-import makeUrl from "scrape/southwest/url";
+import { getHtml } from 'scrape/skiplagged/html';
+import {makeUrl} from 'scrape/skiplagged/url';
 import { getDepartingTrips, getReturningTrips } from "./scrape";
 
-export async function scrapeSouthwest(params: IFlightSearchParams) {
+export async function scrapeSkiplagged(params: IFlightSearchParams) {
   const processStartTime = process.hrtime();
   const url = await makeUrl(params);
   const html = await getHtml(url);
@@ -13,10 +13,10 @@ export async function scrapeSouthwest(params: IFlightSearchParams) {
     url: url
   };
 
-  if (params.isRoundTrip && params.returnDate) {
-    const returningTrips = await getReturningTrips(html);
-    resData.returnTrips = returningTrips;
-  }
+  // if (params.isRoundTrip && params.returnDate) {
+  //   const returningTrips = await getReturningTrips(html);
+  //   resData.returnTrips = returningTrips;
+  // }
 
   const processEndTime = process.hrtime(processStartTime);
   resData.time = processEndTime;
