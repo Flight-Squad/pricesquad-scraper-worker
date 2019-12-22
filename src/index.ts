@@ -1,14 +1,16 @@
 import "module-alias/register"; // Register absolute import paths
-// import 'api/index'
+import "api/index";
 import * as AwsConfig from "config/aws";
 import * as SQS from "aws-sdk/clients/sqs";
 import { scrape } from "scrape";
 import logger from "config/winston";
 import axios from "axios";
 import { PRICESQUAD_API } from "config/pricesquad.api";
-import express from 'express';
+import express from "express";
+import { southwestFlights } from "scrape/southwest";
 type SQSMessage = SQS.Types.Message;
 
+//can comment out all of these for testing and create a script and some dummy data for testing.
 const { Consumer } = require("sqs-consumer");
 
 // https://github.com/bbc/sqs-consumer
@@ -22,16 +24,16 @@ const app = Consumer.create({
   },
   batchSize: 10,
   pollingWaitTimeMs: 500,
-  visibilityTimeout: 100,
+  visibilityTimeout: 100
 });
 
-app.on('stopped', () => {
+app.on("stopped", () => {
   app.start();
-})
+});
 
-app.on('empty', () => {
-  logger.info('Queue is Empty, All messages have been processed')
-})
+app.on("empty", () => {
+  logger.info("Queue is Empty, All messages have been processed");
+});
 app.on("error", err => {
   console.error(err);
 });
@@ -75,8 +77,7 @@ async function handleMessage(message: SQSMessage) {
 // Fix err conn refused on port 80
 const expressApp = express();
 
-expressApp.get('/', (req, res) => res.send('hi'));
-expressApp.post('/', (req, res) => res.send(201));
+expressApp.get("/", (req, res) => res.send("hi"));
+expressApp.post("/", (req, res) => res.send(201));
 
 expressApp.listen(80);
-
