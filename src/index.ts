@@ -7,7 +7,7 @@ import logger from "config/winston";
 import axios from "axios";
 import { PRICESQUAD_API } from "config/pricesquad.api";
 import express from "express";
-import { southwestFlights } from "scrape/southwest";
+
 type SQSMessage = SQS.Types.Message;
 
 //can comment out all of these for testing and create a script and some dummy data for testing.
