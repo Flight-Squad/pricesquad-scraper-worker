@@ -84,6 +84,7 @@ import "module-alias/register"; // Register absolute import paths
 
 
 import {makeUrl} from 'scrape/skiplagged/url';
+import { scrapeSkiplagged } from 'scrape/skiplagged/index';
 
 
 const params = {
@@ -98,8 +99,8 @@ const params = {
 
 
 async function runTest(){
-  const res = await makeUrl(params);
-   console.log(res);
+  const res = await scrapeSkiplagged(params);
+   console.log(JSON.stringify(res,null,2));
 }
 
 runTest();

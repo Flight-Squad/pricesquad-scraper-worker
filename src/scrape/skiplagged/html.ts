@@ -7,7 +7,7 @@ export async function getHtml(url: string) {
   return nightmare
   .goto(url)
   .wait(".trip-duration")
-  .evaluate(() => document.querySelector(".infinite-trip-list").outerHTML)
+  .evaluate(() => document.querySelector(".trip-list").outerHTML)
   .end();
 
 

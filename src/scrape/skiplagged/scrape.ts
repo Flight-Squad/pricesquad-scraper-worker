@@ -9,63 +9,36 @@ export async function getDepartingTrips(html) {
   const trips = [];
   const scraper = cheerio.load(html);
 
-  scraper(this).each((i, elem) => parseTrips(i, elem, trips));
-
-  console.log(trips.length);
-  return trips;
-}
-
-/**
- *
- * @param html The html to parse
- */
-export async function getReturningTrips(html) {
-  const trips = [];
-  const scraper = cheerio.load(html);
-
-  scraper(".air-booking-select-price-matrix")
-    .filter(function(i, el) {
-      return scraper(this).attr("id") === "air-booking-product-1";
-    })
-    .each((i, elem) => parseTrips(i, elem, trips));
-
-  return trips;
-}
-
-/**
- *
- * @param i
- * @param elem
- * @param trips Array to push the trip obejects into
- */
-function parseTrips(i, elem, trips) {
-  const scraper = cheerio.load(elem);
-  scraper(this).each(function(i, elem) {
+  await scraper(".infinite-trip-list").each(function(i, elem) {
     scraper(this)
-      .find(".trips")
+      .find(".trip")
       .each(function(i, elem) {
         const trip: any = { times: {} };
 
         trip.times.depart = scraper(this)
-          .find(".trip-path-point-time ")
-          .filter(function(i, el) {
-            return scraper(this).attr("type") === "origination";
-          })
+          .find(".trip-path-point-time")
           .text()
           .trim();
 
+        trip.times.depart = trip.times.depart.substring(
+          0,
+          trip.times.depart.indexOf("m") + 1
+        );
+
         trip.times.arrival = scraper(this)
           .find(".trip-path-point-last")
-          .filter(function(i, el) {
-            return scraper(this).attr("type") === "destination";
-          })
           .text()
           .trim();
+        trip.times.arrival = trip.times.arrival.substring(
+          0,
+          trip.times.arrival.indexOf("m") + 1
+        );
 
         trip.duration = scraper(this)
           .find(".trip-path-duration")
           .text()
           .trim();
+        trip.duration = trip.duration.split(" ", 1);
 
         trip.stops = scraper(this)
           .find(".trip-stops")
@@ -74,14 +47,16 @@ function parseTrips(i, elem, trips) {
 
         trip.price = scraper(this)
           .find(".trip-cost")
-          .last()
-          .text();
+          .find("p")
+          .text()
+          .trim();
 
-        trip.price = Number(trip.price);
+        trip.price = currencyFormatter.unformat(trip.price, { code: "USD" });
 
-        if (trip.price) {
-          trips.push(trip);
-        }
+        trips.push(trip);
       });
   });
+
+  console.log(trips.length);
+  return trips;
 }

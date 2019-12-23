@@ -1,12 +1,13 @@
 import { IFlightSearchParams } from "data/flight/search/params";
-import { getHtml } from 'scrape/skiplagged/html';
-import {makeUrl} from 'scrape/skiplagged/url';
-import { getDepartingTrips, getReturningTrips } from "./scrape";
+import { getHtml } from "scrape/skiplagged/html";
+import { makeUrl } from "scrape/skiplagged/url";
+import { getDepartingTrips } from "./scrape";
 
 export async function scrapeSkiplagged(params: IFlightSearchParams) {
   const processStartTime = process.hrtime();
   const url = await makeUrl(params);
   const html = await getHtml(url);
+  console.log(html);
   const departingTrips = await getDepartingTrips(html);
   const resData: any = {
     data: departingTrips,
