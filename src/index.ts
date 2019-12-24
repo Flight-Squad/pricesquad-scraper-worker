@@ -1,5 +1,3 @@
-import "module-alias/register"; // Register absolute import paths
-import "api/index";
 import * as AwsConfig from "config/aws";
 import * as SQS from "aws-sdk/clients/sqs";
 import { scrape } from "scrape";
