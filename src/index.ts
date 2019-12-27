@@ -83,8 +83,8 @@ import "module-alias/register"; // Register absolute import paths
 // expressApp.listen(80);
 
 
-import {makeUrl} from 'scrape/skiplagged/url';
-import { scrapeSkiplagged } from 'scrape/skiplagged/index';
+import {makeUrl} from 'scrape/student-universe/url';
+import { scrapeStudentUniverse } from 'scrape/student-universe/index';
 
 
 const params = {
@@ -99,7 +99,7 @@ const params = {
 
 
 async function runTest(){
-  const res = await scrapeSkiplagged(params);
+  const res = await scrapeStudentUniverse(params);
    console.log(JSON.stringify(res,null,2));
 }
 
