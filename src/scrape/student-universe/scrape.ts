@@ -9,37 +9,38 @@ export async function getDepartingTrips(html) {
   const trips = [];
   const scraper = cheerio.load(html);
 
-  // console.log(scraper(".ng-scope"))
-  // trip.depart.time...
-  //trip.return.time....
+  //BROKEN IN THE SENSE THAT IT ONLY SEMI-WORKS FOR FLIGHTS WITH MORE THAN ONE STOP
 
   scraper(".itin").each(function(i, elem) {
     const trip: any = {
       return: { times: {}, airline: {} },
       depart: { times: {}, airline: {} }
     };
-    trip.depart.airline = scraper(this)
+    trip.depart.airline.name = scraper(this)
       .find(".itin-leg-summary-carrier")
       .find("#airlineName0")
       .text()
       .trim();
 
-
-    trip.return.airline = scraper(this)
+    trip.return.airline.name = scraper(this)
       .find(".itin-leg-summary-carrier")
       .find("#airlineName1")
       .text()
       .trim();
-      // scraper("su-itinerary-leg-details").each(function(i, elem) {
-      //   // for each "su-itinerary-leg-details" found, do the following:
-      //   trip.depart.airline.number = scraper(this).find(
-      //     "#flightNumberLeg0flight0"
-      //   );
-      //   trip.return.airline.number = scraper(this).find(
-      //     "#flightNumberLeg1flight1"
-      //   );
-      // });
 
+    scraper(this).find("su-itinerary-leg-details").each(function(i, elem) {
+      // for each "su-itinerary-leg-details" found, do the following:
+      trip.depart.airline.number = scraper(this)
+     // .find(".itin-details-carrier")
+        .find("#flightNumberLeg0flight0")
+        .text()
+        .trim();
+      trip.return.airline.number = scraper(this)
+      //.find(".itin-details-carrier")
+        .find("#flightNumberLeg1flight1")
+        .text()
+        .trim();
+    });
 
     trip.depart.times.depart = scraper(this)
       .find(".itin-leg-summary-times")
