@@ -91,8 +91,8 @@ const params = {
   origin: 'BOS',
   dest: 'SFO',
   departDate: new Date('2020-01-10'),
-  returnDate: new Date('2020-01-20'),
-  isRoundTrip: true,
+
+  isRoundTrip: false,
   numStops: 0
 
 };

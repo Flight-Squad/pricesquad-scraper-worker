@@ -13,34 +13,70 @@ export async function getDepartingTrips(html) {
 
   scraper(".itin").each(function(i, elem) {
     const trip: any = {
-      return: { times: {}, airline: {} },
-      depart: { times: {}, airline: {} }
+      return: { times: {} },
+      depart: { times: {} }
     };
-    trip.depart.airline.name = scraper(this)
+    trip.depart.stops = scraper(this)
+      .find(".itin-leg-summary-stops")
+      .find("#stops0")
+      .text()
+      .trim();
+    //  trip.depart.b4stop = trip.depart.stops
+    // trip.depart.stops = parseInt(trip.depart.stops.split(" ", 1));
+
+    trip.return.stops = scraper(this)
+      .find(".itin-leg-summary-stops")
+      .find("#stops1")
+      .text()
+      .trim();
+    //   trip.return.b4stop = trip.return.stops
+    // trip.return.stops = parseInt(trip.return.stops.split(" ", 1));
+
+    trip.depart.airline = scraper(this)
       .find(".itin-leg-summary-carrier")
       .find("#airlineName0")
       .text()
       .trim();
 
-    trip.return.airline.name = scraper(this)
+    trip.return.airline = scraper(this)
       .find(".itin-leg-summary-carrier")
       .find("#airlineName1")
       .text()
       .trim();
 
-    scraper(this).find("su-itinerary-leg-details").each(function(i, elem) {
-      // for each "su-itinerary-leg-details" found, do the following:
-      trip.depart.airline.number = scraper(this)
-     // .find(".itin-details-carrier")
-        .find("#flightNumberLeg0flight0")
-        .text()
-        .trim();
-      trip.return.airline.number = scraper(this)
-      //.find(".itin-details-carrier")
-        .find("#flightNumberLeg1flight1")
-        .text()
-        .trim();
-    });
+
+//  scraper(this).find(".collapse in")
+//       .find("su-itinerary-leg-details")
+//       .each(function(i, elem) {
+//        // var number = [];
+//         // for each "su-itinerary-leg-details" found, do the following:
+
+//         if(i ==0){
+//           // .filter('segment in leg.flightSegments').attr('ng-repeat')
+//           scraper(this).find("su-itinerary-leg-segment-details").each(function(i,elem){ // for each flight stop, find the number
+//             trip.depart.airline.number = scraper(this).find(".itin-details-carrier").find(".ng-binding").text().trim() ;
+//           })
+//         }else if(i==1){
+//           scraper(this).find("su-itinerary-leg-segment-details").each(function(i,elem){ // for each flight stop, find the number
+//             trip.return.airline.number = scraper(this).find(".itin-details-carrier").find(".ng-binding").text().trim() ;
+//           })
+//         }else{
+//           // console.log("don't know whyyy")
+//         }
+
+//         // trip.depart.airline.number = scraper(this)
+//         //   // .find(".itin-details-carrier")
+//         //   .find("#flightNumberLeg0flight0")
+//         //   .text()
+//         //   .trim();
+//         // trip.return.airline.number = scraper(this)
+//         //   //.find(".itin-details-carrier")
+//         //   .find("#flightNumberLeg1flight0")
+//         //   .text()
+//         //   .trim();
+//       });
+
+
 
     trip.depart.times.depart = scraper(this)
       .find(".itin-leg-summary-times")
@@ -69,7 +105,6 @@ export async function getDepartingTrips(html) {
       .find("#duration0")
       .text()
       .trim();
-    // trip.duration = trip.duration.split(" ", 1);
 
     trip.return.duration = scraper(this)
       .find(".itin-leg-summary-duration")
@@ -77,16 +112,7 @@ export async function getDepartingTrips(html) {
       .text()
       .trim();
 
-    trip.depart.stops = scraper(this)
-      .find(".itin-leg-summary-stops")
-      .find("#stops0")
-      .text()
-      .trim();
-    trip.return.stops = scraper(this)
-      .find(".itin-leg-summary-stops")
-      .find("#stops1")
-      .text()
-      .trim();
+
 
     trip.price = scraper(this)
       .find(".itin-price-price")

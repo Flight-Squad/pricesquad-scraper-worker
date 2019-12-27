@@ -7,6 +7,7 @@ export async function scrapeStudentUniverse(params: IFlightSearchParams) {
   const processStartTime = process.hrtime();
   const url = await makeUrl(params);
   const html = await getHtml(url);
+
 // const fs =require ('fs')
 //   fs.writeFile( 'A:/Documents/Write Files/HTML.txt', html, (err) => {
 
