@@ -15,7 +15,10 @@ export async function kayakTripData(html) {
 
     scraper(this).find('.resultInner').find('.section.duration').find('.top').each(function (i, elem) {
       let duration = scraper(this).text().trim();
-      duration = duration.replace(/\\"/g, ''); //regex used to remove escape characters
+      // https://stackoverflow.com/questions/6640382/how-to-remove-backslash-escaping-from-a-javascript-var
+      // Regex removes any escaped characters
+      // Added because Kayak included a newline '\n' preceding actual duration
+      duration = duration.replace(/\\"/g, '');
       durations.push(duration);
     })
 
@@ -27,16 +30,14 @@ export async function kayakTripData(html) {
 
   });
 
-  const trips = makeAggregatorTripsData(prices, stops, airlines, durations);
-
-  return trips;
+  return makeAggregatorTripsData(prices, stops, airlines, durations);
 }
 
 function makeAggregatorTripsData(prices, stops, airlines, durations) {
-  const dataIsConsistent = prices.length === stops.length && stops.length === durations.length && durations.length === airlines.length; //True or False - used for later selection
+  const dataIsConsistent = prices.length === stops.length && stops.length === durations.length && durations.length === airlines.length;
   const trips = [];
   if (dataIsConsistent) {
-    for (let i = 0; i < stops.length; i ++) {
+    for (let i = 0; i < stops.length; i++) {
       trips.push({
         price: prices[i],
         stops: stops[i],
@@ -45,6 +46,8 @@ function makeAggregatorTripsData(prices, stops, airlines, durations) {
       })
     }
   } else {
+    // TODO extract into separate method
+    // https://refactoring.guru/extract-method
     const lengthData = {
       prices: prices.length,
       stops: stops.length,
