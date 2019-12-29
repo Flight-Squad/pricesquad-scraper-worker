@@ -7,7 +7,7 @@ export async function scrapeKayak(params: IFlightSearchParams) {
   const processStartTime = process.hrtime();
   const url = await makeUrl(params);
   const html = await getHtml(url);
-  const trips = kayakTripData(html);
+  const trips = await kayakTripData(html);
   const response: any = {
     data: trips,
     url: url
