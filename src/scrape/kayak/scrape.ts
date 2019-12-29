@@ -48,6 +48,8 @@ function makeAggregatorTripsData(prices, stops, airlines, durations) {
       })
     }
   } else {
+    // TODO extract into separate method
+    // https://refactoring.guru/extract-method
     const lengthData = {
       prices: prices.length,
       stops: stops.length,
