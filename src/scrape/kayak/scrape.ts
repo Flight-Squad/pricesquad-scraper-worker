@@ -36,7 +36,7 @@ function makeAggregatorTripsData(prices, stops, airlines, durations) {
   const dataIsConsistent = prices.length === stops.length && stops.length === durations.length && durations.length === airlines.length; //True or False - used for later selection
   const trips = [];
   if (dataIsConsistent) {
-    for (let i = 0; i < stops.length; i ++) {
+    for (let i = 0; i < stops.length; i++) {
       trips.push({
         price: prices[i],
         stops: stops[i],
