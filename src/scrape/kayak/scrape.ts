@@ -30,9 +30,7 @@ export async function kayakTripData(html) {
 
   });
 
-  const trips = makeAggregatorTripsData(prices, stops, airlines, durations);
-
-  return trips;
+  return makeAggregatorTripsData(prices, stops, airlines, durations);
 }
 
 function makeAggregatorTripsData(prices, stops, airlines, durations) {
