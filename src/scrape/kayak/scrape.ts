@@ -15,7 +15,10 @@ export async function kayakTripData(html) {
 
     scraper(this).find('.resultInner').find('.section.duration').find('.top').each(function (i, elem) {
       let duration = scraper(this).text().trim();
-      duration = duration.replace(/\\"/g, ''); //regex used to remove escape characters
+      // https://stackoverflow.com/questions/6640382/how-to-remove-backslash-escaping-from-a-javascript-var
+      // Regex removes any escaped characters
+      // Added because Kayak included a newline '\n' preceding actual duration
+      duration = duration.replace(/\\"/g, '');
       durations.push(duration);
     })
 
