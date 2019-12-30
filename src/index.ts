@@ -44,8 +44,10 @@ logger.info("Starting app...");
 app.start();
 
 async function handleMessage(message: SQSMessage) {
+  // FIXME: IMessageBody is out of date
+  // FIXME: Message Chain code smell
   const data = JSON.parse(message.Body);
-  const { tripId, sessionId, provider, docPath } = data;
+  const { tripId, sessionId, provider, docPath, params } = data;
   const requestId = {tripId, sessionId, provider, docPath};
 
   // Commented out because this can/should be handled more succinctly and scalably
@@ -62,6 +64,7 @@ async function handleMessage(message: SQSMessage) {
       tripId,
       sessionId,
       docPath,
+      tripQuery: params,
     };
 
     await axios.post(postUrl, postBody);
