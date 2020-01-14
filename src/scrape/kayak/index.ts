@@ -1,20 +1,15 @@
-import { IFlightSearchParams } from "data/flight/search/params";
-import makeUrl from "scrape/kayak/url";
-import { getHtml } from "scrape/kayak/html";
-import { kayakTripData } from "./scrape";
+import makeUrl from 'scrape/kayak/url';
+import { getHtml } from 'scrape/kayak/html';
+import { kayakTripData } from './scrape';
+import { TripScraperQuery, ProviderResults } from '@flight-squad/admin';
 
-export async function scrapeKayak(params: IFlightSearchParams) {
-  const processStartTime = process.hrtime();
-  const url = await makeUrl(params);
-  const html = await getHtml(url);
-  const trips = await kayakTripData(html);
-  const response: any = {
-    data: trips,
-    url: url
-  }
+export async function scrapeKayak(params: TripScraperQuery): Promise<ProviderResults> {
+    const url = await makeUrl(params);
+    const html = await getHtml(url);
+    const trips = await kayakTripData(html);
 
-  const processEndTime = process.hrtime(processStartTime);
-  response.time = processEndTime;
-
-  return response;
+    return {
+        data: trips,
+        url: url,
+    };
 }

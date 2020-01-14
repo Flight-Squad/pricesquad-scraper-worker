@@ -1,14 +1,13 @@
-import { IMessageBody } from "data/queue/message/body";
-import { SearchProviders } from "data/flight/search/providers";
-import scrapeGoogle from "./google";
+import scrapeGoogle from './google';
+import { ProviderResults, SearchProviders, TripScraperQuery } from '@flight-squad/admin';
 
-const providerNotImplemented = new Error('Provider not implemented');
+const providerNotImplemented = (provider: string): Error => new Error(`Provider '${provider}' not implemented`);
 
-export async function scrape(data: IMessageBody) {
-  switch (data.provider) {
-    case SearchProviders.google: return scrapeGoogle(data.params);
-    case SearchProviders.kayak: throw providerNotImplemented;
-    case SearchProviders.southwest: throw providerNotImplemented;
-    default: throw new Error('Provider not supported');
-  }
+export function delegate(provider: SearchProviders): (query: TripScraperQuery) => Promise<ProviderResults> {
+    switch (provider) {
+        case SearchProviders.GoogleFlights:
+            return scrapeGoogle;
+        default:
+            throw providerNotImplemented(provider);
+    }
 }

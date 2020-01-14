@@ -9,6 +9,7 @@
   "scripts": {
     "clean": "rm -r ./bin",
     "compile": "tsc",
+    "build:check": "tsc --noEmit",
     "compile:win": "SET NODE_ENV=development&& tsc",
     "docker": "xvfb-run -e /dev/stdout -a --server-args=\"-screen 0 1280x1028x24 -ac +extension GLX +render -nolisten unix\" npm run start",
     "docker:debug": "DEBUG=* xvfb-run -e /dev/stdout -a --server-args=\"-screen 0 1280x1028x24 -ac +extension GLX +render -nolisten unix\" npm run start",
@@ -20,7 +21,7 @@
     "test-cover:win": "c8 --check-coverage --lines 100 npm run test:win"
   },
   "dependencies": {
-    "@flight-squad/admin": "0.0.6",
+    "@flight-squad/admin": "0.0.7",
     "@types/app-root-path": "^1.2.4",
     "@types/express": "^4.17.1",
     "@types/morgan": "^1.7.37",
