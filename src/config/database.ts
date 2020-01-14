@@ -2,7 +2,7 @@ import { Database } from '@flight-squad/admin';
 import path from 'path';
 
 Database.init({
-    serviceAccount: process.env.FS_CONFIG,
+    serviceAccount: process.env.FIRESTORE_CONFIG,
     serviceAccountPath: path.resolve(__dirname, './serviceAccount.json'),
 });
 
