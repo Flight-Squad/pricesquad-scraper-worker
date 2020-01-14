@@ -43,4 +43,4 @@ const expressApp = express();
 expressApp.get('/', (req, res) => res.send('hi'));
 expressApp.post('/', (req, res) => res.send(201));
 
-expressApp.listen(80 || process.env.PORT);
+expressApp.listen(process.env.PORT || 80);

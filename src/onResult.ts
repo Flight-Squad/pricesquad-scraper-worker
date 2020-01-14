@@ -10,7 +10,8 @@ export async function onResult(group: TripGroup): Promise<void> {
     if (search && search.isDone()) {
         search = await search.updateStatus(FlightSearchStatus.Done);
         const bestTrip = await search.bestTrip();
-        logger.info(`Best Trip is ${JSON.stringify(bestTrip, null, 2)}`);
+        // Temporary, just for visual testing via terminal
+        console.log(bestTrip);
         // use best trip to
         //  - create payment details
         //  - send message back to user

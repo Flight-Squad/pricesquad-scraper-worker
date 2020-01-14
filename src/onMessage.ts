@@ -28,6 +28,8 @@ export async function onMessage(message: SQSMessage): Promise<void> {
         logger.info(`[FINISHED] Processed ${message.MessageId}`);
         // logger.info(JSON.stringify({requestId: data.params.requestId, res: res,}));
     } catch (e) {
-        logger.error(e.message);
+        console.log(query);
+        console.error(e);
+        // throw e;
     }
 }

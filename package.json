@@ -14,6 +14,7 @@
     "docker": "xvfb-run -e /dev/stdout -a --server-args=\"-screen 0 1280x1028x24 -ac +extension GLX +render -nolisten unix\" npm run start",
     "docker:debug": "DEBUG=* xvfb-run -e /dev/stdout -a --server-args=\"-screen 0 1280x1028x24 -ac +extension GLX +render -nolisten unix\" npm run start",
     "start": "npm run compile && node -r dotenv/config -r module-alias/register ./bin/index",
+    "start:dev": "cross-env DEBUG=flightsquad:* npm run start",
     "start:win": "npm run compile:win && node -r dotenv/config ./bin/index",
     "test": "npm run compile && ava",
     "test:win": "npm run compile:win && ava",
@@ -21,7 +22,7 @@
     "test-cover:win": "c8 --check-coverage --lines 100 npm run test:win"
   },
   "dependencies": {
-    "@flight-squad/admin": "0.0.7",
+    "@flight-squad/admin": "0.0.26",
     "@types/app-root-path": "^1.2.4",
     "@types/express": "^4.17.1",
     "@types/morgan": "^1.7.37",
@@ -56,6 +57,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.16.0",
     "@typescript-eslint/parser": "^2.16.0",
+    "cross-env": "^6.0.3",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-plugin-prettier": "^3.1.2",
