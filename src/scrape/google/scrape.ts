@@ -9,7 +9,7 @@ export async function getTripsFromHtml(html): Promise<Trip[]> {
         scraper(this)
             .find('li')
             .each(function(i, elem) {
-                // const trip: Trip = { price: 0, stops: [], provider: SearchProviders.GoogleFlights };
+                // const trip: Trip = { price: 0, stops: [], provider: SearchProviders.GoogleFlights, };
                 const trip: any = {};
 
                 trip.times = scraper(this)

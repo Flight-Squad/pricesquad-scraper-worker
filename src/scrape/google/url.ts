@@ -1,5 +1,6 @@
-import { formatDateAsKebab } from 'data/date/formatter';
 import { TripScraperQuery, FlightStops } from '@flight-squad/admin';
+import { formatISO } from 'date-fns';
+
 /**
  *
  * @param isRoundTrip
@@ -36,8 +37,8 @@ function idek() {
 }
 
 async function makeUrl(params: TripScraperQuery): Promise<string> {
-    const departDate = formatDateAsKebab(new Date(params.departDate));
-    const returnDate = params.returnDate ? formatDateAsKebab(new Date(params.returnDate)) : '';
+    const departDate = formatISO(new Date(params.departDate), { representation: 'date' });
+    const returnDate = params.returnDate ? formatISO(new Date(params.returnDate), { representation: 'date' }) : '';
     const roundTripQuery = makeRoundTripQuery(params.isRoundTrip, params.origin, params.dest, returnDate);
     const stopsQuery = makeStopsQuery(params.stops);
     const oneWayQuery = makeOneWayQuery(params.isRoundTrip);

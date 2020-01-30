@@ -1,21 +1,15 @@
 {
     "compilerOptions": {
-      "module": "commonjs",
-      "target": "es6",
-      "lib": ["es6", "dom"],
-      "outDir": "./bin",
-      "sourceMap": true,
-      "esModuleInterop": true,
-      "baseUrl": "./src",
-      "paths": {
-        "*": [
-          "*",
-          "bin/*"
-        ]
-      },
+        "module": "commonjs",
+        "target": "es2017",
+        "lib": ["es6", "dom"],
+        "outDir": "./bin",
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "baseUrl": "./",
+        "paths": {
+            "*": ["src/*"]
+        }
     },
-    "exclude": [
-      "node_modules",
-      "docs"
-    ]
-  }
+    "exclude": ["node_modules", "docs"]
+}

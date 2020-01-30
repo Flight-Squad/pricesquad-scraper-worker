@@ -6,23 +6,27 @@ import {
     Trip,
     Customer,
     Chatsquad,
+    PricingStrategyConfig,
+    Discount,
+    ValidPricingStrategyConfig,
 } from '@flight-squad/admin';
 import { PRICESQUAD_API, CHATSQUAD_API } from 'config/squad.api';
 import { DB } from 'config/database';
+
+async function discountStrategy(search: FlightSearch): Promise<ValidPricingStrategyConfig> {
+    const cfg = new PricingStrategyConfig(process.env.GSHEETS_DOC, process.env.DISCOUNT_SHEET_NAME, search.db);
+    await cfg.load();
+    return cfg.strategy();
+}
 
 /**
  * Returns a function that takes a `Trip` and calculates the price to charge
  * based on the benchmark from the `FlightSearch`.
  * @param search search to find benchmark in
  */
-function benchmarker(search: FlightSearch) {
+function discount(strategy: ValidPricingStrategyConfig) {
     return async function(trip: Trip): Promise<string> {
-        const { price } = trip;
-        if (price <= 300) return (price * 0.94).toFixed(2);
-        if (price > 300 && price <= 500) return (price * 0.89).toFixed(2);
-
-        // else
-        return (price * 0.86).toFixed(2);
+        return Discount(trip.price, strategy).toFixed(2);
     };
 }
 
@@ -32,10 +36,27 @@ function benchmarker(search: FlightSearch) {
  */
 export async function onResult(group: TripGroup): Promise<void> {
     let search: FlightSearch = await group.finish();
+    console.log(`searchExists=${Boolean(search)}`);
+    if (Boolean(search)) console.log(`searchIsDone=${search.isDone()}`);
+    console.log(group.isDone());
+    console.log(group.providers);
     if (search && search.isDone()) {
         search = await search.updateStatus(FlightSearchStatus.Done);
         const bestTrip = await search.bestTrip();
-        const calculateUsdCharge = benchmarker(search);
+        if (!bestTrip) {
+            await search.updateStatus(FlightSearchStatus.Error);
+            const chatsquad = new Chatsquad(CHATSQUAD_API);
+            const customer = await Customer.find(DB, search.meta.customer);
+            await chatsquad.send.msg({
+                platform: search.meta.platform,
+                id: customer.messaging[search.meta.platform],
+                message:
+                    'We ran into a few hiccups trying to find the best flight for you. A human should reach out to help you shortly.',
+            });
+            return;
+        }
+        const strategy = await discountStrategy(search);
+        const calculateUsdCharge = discount(strategy);
         const pricesquad = new Pricesquad(PRICESQUAD_API);
         const payment = await pricesquad.tx.create({
             customer: search.meta.customer,
@@ -46,10 +67,12 @@ export async function onResult(group: TripGroup): Promise<void> {
         const chatsquad = new Chatsquad(CHATSQUAD_API);
         const customer = await Customer.find(DB, search.meta.customer);
 
-        await chatsquad.send.payment.msg({
+        await chatsquad.send.payment({
             platform: search.meta.platform,
             id: customer.messaging[search.meta.platform],
             payment,
+            trip: bestTrip,
+            query: group.query,
         });
         // Temporary, just for visual testing via terminal
         console.log(bestTrip);

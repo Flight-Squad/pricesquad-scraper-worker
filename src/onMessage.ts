@@ -22,14 +22,7 @@ export async function onMessage(message: SQSMessage): Promise<void> {
     logger.debug(`Processing ${message.MessageId}`);
     // }
 
-    try {
-        const res: ProviderResults = await scrape(query); // interfaces?
-        await onResult(await group.addProvider(provider, res));
-        logger.info(`[FINISHED] Processed ${message.MessageId}`);
-        // logger.info(JSON.stringify({requestId: data.params.requestId, res: res,}));
-    } catch (e) {
-        console.log(query);
-        console.error(e);
-        // throw e;
-    }
+    const res: ProviderResults = await scrape(query); // interfaces?
+    await onResult(await group.addProvider(provider, res));
+    logger.info(`[FINISHED] Processed ${message.MessageId}`);
 }

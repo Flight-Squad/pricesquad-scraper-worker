@@ -1,7 +1,7 @@
 import * as cases from './cases';
 import { SearchProviders, ProviderResults, Trip, TripStop } from '@flight-squad/admin';
 import { delegate } from 'scrape';
-import assert from 'assert';
+import { assert } from 'chai';
 
 function isProvResult(obj: any): obj is ProviderResults {
     function isTrip(obj: any): obj is Trip {
@@ -24,7 +24,7 @@ function isProvResult(obj: any): obj is ProviderResults {
 const maxMilliPerCase = 30 * 1000;
 
 for (const [, prov] of Object.entries(SearchProviders)) {
-    describe(`When ${prov} is provided`, function() {
+    describe(`When ${prov} is provided @slow`, function() {
         const scrape = delegate(prov);
         const testCases = Object.entries(cases);
         this.timeout(maxMilliPerCase * testCases.length);
