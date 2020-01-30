@@ -10,7 +10,7 @@ import { ProviderResults, TripScraperQuery } from '@flight-squad/admin';
 async function scrapeGoogle(query: TripScraperQuery): Promise<ProviderResults> {
     const url = await makeUrl(query);
     const listContainer = await getHtml(url);
-    const trips = await getTripsFromHtml(listContainer);
+    const trips = await getTripsFromHtml(query, listContainer);
 
     return {
         data: trips,
