@@ -30,11 +30,11 @@ function discount(strategy: ValidPricingStrategyConfig) {
     };
 }
 
-/**
- * PreCondition: Any results have been added to the trip group
- * @param group
- */
-export async function onResult(group: TripGroup): Promise<void> {
+export interface ResultHandler {
+    (group: TripGroup, ...args: unknown[]): Promise<void>;
+}
+
+const informCustomerOnResult: ResultHandler = async (group: TripGroup): Promise<void> => {
     let search: FlightSearch = await group.finish();
     console.log(`searchExists=${Boolean(search)}`);
     if (Boolean(search)) console.log(`searchIsDone=${search.isDone()}`);
@@ -77,4 +77,26 @@ export async function onResult(group: TripGroup): Promise<void> {
         // Temporary, just for visual testing via terminal
         console.log(bestTrip);
     }
-}
+};
+
+const DataTargets = Object.freeze({
+    customer: 'customer',
+    monitor: 'monitor',
+});
+
+const target = (dataTarget: string): ResultHandler => {
+    switch (dataTarget) {
+        case DataTargets.monitor:
+            return async (group: TripGroup): Promise<void> => {
+                await group.finish();
+            };
+        default:
+            return informCustomerOnResult;
+    }
+};
+
+/**
+ * PreCondition: Any results have been added to the trip group
+ * @param group
+ */
+export const onResult = target(process.env.DATA_TARGET || DataTargets.customer);
