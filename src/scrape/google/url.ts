@@ -31,14 +31,20 @@ function makeOneWayQuery(isRoundTrip): string {
     return '';
 }
 
+/**
+ * Formats given date as yyyy-mm-dd
+ * @param date
+ */
+const dateAsISO = (date: string | Date): string => formatISO(new Date(date), { representation: 'date' });
+
 function idek() {
     // "sc:"&left(A1,1)
     // is this a bug because it won't be separated by semicolon if max 1 stop
 }
 
 async function makeUrl(params: TripScraperQuery): Promise<string> {
-    const departDate = formatISO(new Date(params.departDate), { representation: 'date' });
-    const returnDate = params.returnDate ? formatISO(new Date(params.returnDate), { representation: 'date' }) : '';
+    const departDate = dateAsISO(params.departDate);
+    const returnDate = dateAsISO(params.returnDate);
     const roundTripQuery = makeRoundTripQuery(params.isRoundTrip, params.origin, params.dest, returnDate);
     const stopsQuery = makeStopsQuery(params.stops);
     const oneWayQuery = makeOneWayQuery(params.isRoundTrip);
