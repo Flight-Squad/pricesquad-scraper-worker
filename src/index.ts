@@ -11,7 +11,12 @@ const app = Consumer.create({
     region: AwsConfig.Region,
     handleMessageBatch: async (messages: SQSMessage[]) => {
         for (const message of messages) {
-            await onMessage(message);
+            try {
+                await onMessage(message);
+            } catch (e) {
+                logger.error(message.Body);
+                logger.error(e.message);
+            }
         }
     },
     batchSize: 10,
