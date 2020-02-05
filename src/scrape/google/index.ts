@@ -1,7 +1,7 @@
 import { getHtml } from './html';
-import makeUrl from './url';
+import makeUrl, { makeReturningFlightsUrl } from './url';
 import { getTripsFromHtml } from './scrape';
-import { ProviderResults, TripScraperQuery } from '@flight-squad/admin';
+import { ProviderResults, TripScraperQuery, TripGroup, Trip } from '@flight-squad/admin';
 
 /**
  * params in an object with the following
@@ -10,7 +10,16 @@ import { ProviderResults, TripScraperQuery } from '@flight-squad/admin';
 async function scrapeGoogle(query: TripScraperQuery): Promise<ProviderResults> {
     const url = await makeUrl(query);
     const listContainer = await getHtml(url);
-    const trips = await getTripsFromHtml(query, listContainer);
+    let trips = await getTripsFromHtml(query, listContainer);
+
+    if (query.isRoundTrip) {
+        trips = trips.sort(TripGroup.SortPriceAsc);
+        const returnFlightsUrl = await makeReturningFlightsUrl(query, trips[0].stops);
+        const returnFlights: Trip[] = await getReturningTrips(await getHtml(returnFlightsUrl)).sort(
+            TripGroup.SortPriceAsc,
+        );
+        trips.forEach(trip => trip.stops.push(...returnFlights[0].stops));
+    }
 
     return {
         data: trips,

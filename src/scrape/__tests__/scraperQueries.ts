@@ -1,5 +1,5 @@
 import { TripGroupQuery, FlightStops } from '@flight-squad/admin';
-import { format, formatISO, add } from 'date-fns';
+import { formatISO, add } from 'date-fns';
 
 const today = new Date();
 
@@ -22,6 +22,15 @@ export const DomesticOnewayInOneWeek: TripGroupQuery = {
 export const DomesticRoundTripInOneWeek: TripGroupQuery = {
     origin: 'BOS',
     dest: 'BWI',
+    departDate: formatISO(add(today, { days: 7 }), { representation: 'date' }),
+    returnDate: formatISO(add(today, { days: 14 }), { representation: 'date' }),
+    isRoundTrip: true,
+    stops: FlightStops.AnyStops,
+};
+
+export const IntlRoundTripInOneWeek: TripGroupQuery = {
+    origin: 'BOS',
+    dest: 'ISB',
     departDate: formatISO(add(today, { days: 7 }), { representation: 'date' }),
     returnDate: formatISO(add(today, { days: 14 }), { representation: 'date' }),
     isRoundTrip: true,
