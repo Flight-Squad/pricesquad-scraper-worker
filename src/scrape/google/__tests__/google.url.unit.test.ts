@@ -38,7 +38,7 @@ describe('Google URL Generator', async () => {
                 {
                     stop: { code: 'BOS', city: 'Boston', name: '' },
                     operator: '',
-                    flightNum: 'QR 744',
+                    flightNum: 'B6 427',
                     arrivalTime: '',
                     departTime: '',
                     duration: '',
@@ -61,6 +61,7 @@ describe('Google URL Generator', async () => {
                 },
             ];
             const queryParts = makeLayoverQueryAccum(stops.length - 1, stops, []);
+            console.log(queryParts);
             expect(queryParts).to.have.length(stops.length - 1);
             queryParts.forEach((val, index) => expect(val.includes(index + '')).to.be.true);
         });
@@ -68,6 +69,7 @@ describe('Google URL Generator', async () => {
     describe('Generate Full URL', async () => {
         it('When asked to generate round trip url, it does it correctly', async () => {
             const url = await makeReturningFlightsUrl(googlifyQuery(Queries.IntlRoundTripInOneWeek), bosIsbStops);
+            expect(url.includes(' ')).to.be.false;
             console.log(url);
         });
     });
