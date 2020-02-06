@@ -2,8 +2,9 @@ import cheerio from 'cheerio';
 import currencyFormatter from 'currency-formatter';
 import { Trip, TripStop, SearchProviders, TripScraperQuery } from '@flight-squad/admin';
 import { parse, addDays } from 'date-fns';
+import { googleDebugger } from '.';
 
-const toAppropriateDate = (time: string, baseDate: Date): Date => {
+function toAppropriateDate(time: string, baseDate: Date): Date {
     // time is usually formatted as "8:59 PM"
     let parsableTime = time;
     let date = baseDate;
@@ -15,9 +16,9 @@ const toAppropriateDate = (time: string, baseDate: Date): Date => {
     }
     // FIXME: Implicitly assuming time is given in eastern time -> maybe from when we parse the query depart date?
     return parse(parsableTime, 'hh:mm a', date);
-};
+}
 
-const emptyStop = () => {
+function emptyStop(): TripStop {
     return {
         stop: { city: '', code: '', name: '' },
         operator: '',
@@ -26,21 +27,83 @@ const emptyStop = () => {
         departTime: '',
         duration: '',
     };
-};
-
-function fillLeg(origin: TripStop, dest: TripStop, legBlock: Cheerio) {}
-
-function fillStops(scraper: CheerioStatic, stops: TripStop[], tripLegs: Cheerio) {
-    tripLegs.each(function(i, elem) {
-        stops[i] = stops[i] || emptyStop();
-        stops[i + 1] = stops[i + 1] || emptyStop();
-        fillLeg(stops[i], stops[i + 1], scraper(this));
-    });
 }
 
-export async function getTripsFromHtml(query: TripScraperQuery, html): Promise<Trip[]> {
+// Cheerio Helper Functions
+const indexOf = (block: Cheerio, index: number): string =>
+    block
+        .eq(index)
+        .text()
+        .trim();
+
+const indexedChildOf = (childType: string, defaultIndex: number) => (block: Cheerio, indexOverload?: number): string =>
+    indexOf(block.children(childType), indexOverload || defaultIndex);
+
+const getChildDiv = indexedChildOf('div', 0);
+const getChildSpan = indexedChildOf('span', 0);
+
+// Scraper Unit Functions
+const LegScraper = (legBlock: Cheerio) =>
+    Object.freeze({
+        depart: {
+            time: (): string => getChildDiv(legBlock.find('.gws-flights-results__leg-departure')),
+            code: (): string => indexOf(legBlock.find('.gws-flights-results__iata-code'), 0),
+        },
+        arrival: {
+            time: (): string => getChildDiv(legBlock.find('.gws-flights-results__leg-arrival')),
+            code: (): string => indexOf(legBlock.find('.gws-flights-results__iata-code'), 1),
+        },
+        duration: (): string =>
+            legBlock
+                .find('.gws-flights-results__leg-duration')
+                .find('span')
+                .text()
+                .trim(),
+        airline: (): string => getChildDiv(legBlock.find('.gws-flights-results__leg-flight')),
+        airlineClass: (): string =>
+            legBlock
+                .find('.gws-flights-results__leg-flight')
+                .find('div[class*="gws-flights-results__seating"]')
+                .find('span')
+                .text()
+                .trim(),
+        aircraftType: (): string =>
+            getChildSpan(legBlock.find('.gws-flights-results__leg-flight').find('.gws-flights-results__aircraft-type')),
+        flightNumber: (): string => getChildSpan(legBlock.find('.gws-flights-results__other-leg-info')),
+    });
+
+function setBaseDate(date: Date) {
+    const toTimestamp = (time: string): string => toAppropriateDate(time, date).toISOString();
+    return function fillStops(scraper: CheerioStatic, stops: TripStop[], tripLegs: Cheerio): void {
+        function fillLeg(origin: TripStop, dest: TripStop, legBlock: Cheerio): void {
+            const Scrape = LegScraper(legBlock);
+            // Leg depart time
+            // https://stackoverflow.com/questions/47542338/cheerio-get-image-src-with-no-class
+            origin.departTime = toTimestamp(Scrape.depart.time());
+            origin.stop.code = Scrape.depart.code();
+            origin.duration = Scrape.duration();
+            origin.operator = Scrape.airline();
+            const cabinClass = Scrape.airlineClass();
+            const aircraft = Scrape.aircraftType();
+            origin.flightNum = Scrape.flightNumber();
+
+            dest.arrivalTime = toTimestamp(Scrape.arrival.time());
+            dest.stop.code = Scrape.arrival.code();
+            googleDebugger('Origin', origin);
+            googleDebugger('Dest', dest);
+        }
+
+        tripLegs.each(function(i) {
+            stops[i] = stops[i] || emptyStop();
+            stops[i + 1] = stops[i + 1] || emptyStop();
+            fillLeg(stops[i], stops[i + 1], scraper(this));
+        });
+    };
+}
+
+export async function getTripsFromHtml(query: TripScraperQuery, baseDate: string | Date, html): Promise<Trip[]> {
     const trips: Trip[] = [];
-    const departDate = new Date(query.departDate);
+    const fillStops = setBaseDate(new Date(baseDate));
     const scraper = cheerio.load(html);
     scraper('ol[class*="gws-flights-results__result-list"]').each(function(i, elem) {
         scraper(this)
@@ -48,29 +111,6 @@ export async function getTripsFromHtml(query: TripScraperQuery, html): Promise<T
             .each(function(i, elem) {
                 // Each element represents a trip between 2 stops
                 const trip: Trip = { price: 0, stops: [], provider: SearchProviders.GoogleFlights, query };
-                const originStop: TripStop = emptyStop();
-                const destStop: TripStop = emptyStop();
-
-                const times = scraper(this)
-                    .find('.gws-flights-results__times-row')
-                    .text()
-                    .trim()
-                    .split('–')
-                    .map(item => item.trim())
-                    .filter(item => Boolean(item));
-                if (times.length < 2) return;
-                originStop.departTime = toAppropriateDate(times[0], departDate).toISOString();
-                destStop.arrivalTime = toAppropriateDate(times[1], departDate).toISOString();
-
-                originStop.operator = scraper(this)
-                    .find('.gws-flights-results__carriers')
-                    .text()
-                    .trim();
-
-                originStop.duration = scraper(this)
-                    .find('.gws-flights-results__duration')
-                    .text()
-                    .trim();
 
                 // results in something like
                 // "$299         $299"
@@ -81,89 +121,10 @@ export async function getTripsFromHtml(query: TripScraperQuery, html): Promise<T
 
                 // naiive
                 price = price.split(' ')[0].trim();
-                // console.log(price);
-
                 trip.price = currencyFormatter.unformat(price, { code: 'USD' });
 
-                // fillStops(trip.stops, scraper(this).find('.gws-flights-results__leg'));
-
-                scraper(this)
-                    .find('.gws-flights-results__leg')
-                    .each(function(i, elem) {
-                        // Leg depart time
-                        // https://stackoverflow.com/questions/47542338/cheerio-get-image-src-with-no-class
-                        const legDepart = scraper(this)
-                            .find('.gws-flights-results__leg-departure')
-                            .children('div')
-                            .eq(0)
-                            .text()
-                            .trim();
-
-                        // Leg arrival time
-                        const legArrival = scraper(this)
-                            .find('.gws-flights-results__leg-arrival')
-                            .children('div')
-                            .eq(0)
-                            .text()
-                            .trim();
-
-                        const departCode = scraper(this)
-                            .find('.gws-flights-results__iata-code')
-                            .eq(0)
-                            .text()
-                            .trim();
-
-                        const arriveCode = scraper(this)
-                            .find('.gws-flights-results__iata-code')
-                            .eq(1)
-                            .text()
-                            .trim();
-                        const legDuration = scraper(this)
-                            .find('.gws-flights-results__leg-duration')
-                            .find('span')
-                            .text()
-                            .trim();
-                        const airline = scraper(this)
-                            .find('.gws-flights-results__leg-flight')
-                            .children('div')
-                            .eq(0)
-                            .text()
-                            .trim();
-                        const airlineClass = scraper(this)
-                            .find('.gws-flights-results__leg-flight')
-                            .find('div[class*="gws-flights-results__seating"]')
-                            .find('span')
-                            .text()
-                            .trim();
-                        const aircraft = scraper(this)
-                            .find('.gws-flights-results__leg-flight')
-                            .find('.gws-flights-results__aircraft-type')
-                            .children('span')
-                            .eq(0)
-                            .text()
-                            .trim();
-                        const flightNum = scraper(this)
-                            .find('.gws-flights-results__other-leg-info')
-                            .children('span')
-                            .eq(0)
-                            .text()
-                            .trim();
-                        console.log(
-                            i,
-                            legDepart,
-                            legArrival,
-                            legDuration,
-                            departCode,
-                            arriveCode,
-                            airline,
-                            airlineClass,
-                            aircraft,
-                            flightNum,
-                        );
-                        // console.log(code);
-                    });
-                console.log('-----');
-                trip.stops = [originStop, destStop];
+                fillStops(scraper, trip.stops, scraper(this).find('.gws-flights-results__leg'));
+                googleDebugger('----');
 
                 if (trip.price) {
                     trips.push(trip);

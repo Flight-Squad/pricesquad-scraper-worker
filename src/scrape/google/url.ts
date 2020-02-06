@@ -43,7 +43,7 @@ function idek() {
 }
 
 const urlParts = (params: TripScraperQuery) => {
-    const returnDate = dateAsISO(params.returnDate);
+    const returnDate = params.returnDate ? dateAsISO(params.returnDate) : undefined;
     return {
         departDate: dateAsISO(params.departDate),
         returnDate,
@@ -58,7 +58,9 @@ async function makeUrl(params: TripScraperQuery): Promise<string> {
     return `https://www.google.com/flights?hl=en#flt=${params.origin}.${params.dest}.${departDate}${roundTripQuery};c:USD;e:1;${stopsQuery}sd:1;t:f${oneWayQuery}`;
 }
 
-const stripSpaces = (str: string): string => str.split(' ').join('');
+// Regex: Split on 1 sequential whitespace character
+// https://stackoverflow.com/a/30354926/6656631
+const stripSpaces = (str: string): string => str.split(/\s{1}/).join('');
 const getCode = (stop: TripStop): string => stop.stop.code;
 
 export function makeLayoverQueryAccum(i: number, arr: TripStop[], accum: string[]): string[] {
