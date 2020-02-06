@@ -1,8 +1,7 @@
 import scrapeGoogle from './google';
-import { ProviderResults, SearchProviders, TripScraperQuery } from '@flight-squad/admin';
+import { ProviderResults, SearchProviders, TripScraperQuery, createFlightSquadDebugger } from '@flight-squad/admin';
 import logger from 'config/winston';
 import { EmptyResults } from './emptyResults';
-import { query } from 'winston';
 
 const providerNotImplemented = async (query: TripScraperQuery): Promise<ProviderResults> => {
     logger.warn(`Returning empty results for unimplemented provider '${query.provider}'`);
@@ -40,3 +39,5 @@ export function delegate(provider: SearchProviders): (query: TripScraperQuery) =
             return providerNotImplemented;
     }
 }
+
+export const scraperDebug = createFlightSquadDebugger('scraper');
