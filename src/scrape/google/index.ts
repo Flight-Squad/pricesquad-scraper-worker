@@ -2,7 +2,7 @@ import { getHtml } from './html';
 import makeUrl, { makeReturningFlightsUrl } from './url';
 import { getTripsFromHtml } from './scrape';
 import { ProviderResults, TripScraperQuery, TripGroup, Trip } from '@flight-squad/admin';
-import { scraperDebug } from 'scrape';
+import { scraperDebug } from 'config/debug';
 
 export const googleDebugger = scraperDebug.extend('google');
 

@@ -64,6 +64,8 @@ const informCustomerOnResult: ResultHandler = async (group: TripGroup): Promise<
             amount: Number(await calculateUsdCharge(bestTrip)),
         });
 
+        console.log('Payment', payment);
+
         const chatsquad = new Chatsquad(CHATSQUAD_API);
         const customer = await Customer.find(DB, search.meta.customer);
 

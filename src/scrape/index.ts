@@ -1,5 +1,5 @@
 import scrapeGoogle from './google';
-import { ProviderResults, SearchProviders, TripScraperQuery, createFlightSquadDebugger } from '@flight-squad/admin';
+import { ProviderResults, SearchProviders, TripScraperQuery } from '@flight-squad/admin';
 import logger from 'config/winston';
 import { EmptyResults } from './emptyResults';
 
@@ -39,5 +39,3 @@ export function delegate(provider: SearchProviders): (query: TripScraperQuery) =
             return providerNotImplemented;
     }
 }
-
-export const scraperDebug = createFlightSquadDebugger('scraper');
