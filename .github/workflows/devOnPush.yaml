@@ -23,12 +23,16 @@ jobs:
           NODE_ENV: staging
 
         run: |
-          echo "image tag is $TAG in $NODE_ENV"
           sed -i 's|<ENVKEY>|'${ENVKEY}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+          echo "envkey replaced"
           sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+          echo "image replaced"
           sed -i 's|<NODE_ENV>|'${NODE_ENV}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+          echo "node env replaced"
           sed -i 's|<NPM_TOKEN>|'${NPM_TOKEN}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+          echo "npm token replaced"
           sed -i 's|<DOCKER_CONFIG>|'${DOCKER_CONFIG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+          echo "docker config replaced"
 
       - name: Build and Deploy Container Image
         uses: whoan/docker-build-with-cache-action@v2
