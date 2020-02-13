@@ -1,3 +1,15 @@
+# For pulling packages from Github Package Registry
+apiVersion: v1
+kind: Secret
+metadata:
+    # name must match "imagePullSecrets" key in Deployment below
+    name: github-regcred
+    namespace: default
+data:
+    .dockerconfigjson: <DOCKER_CONFIG>
+type: kubernetes.io/dockerconfigjson
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
