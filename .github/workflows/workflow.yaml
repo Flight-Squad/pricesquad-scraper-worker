@@ -20,13 +20,14 @@ jobs:
                   registry: docker.pkg.github.com
                   image_name: flight-squad/pricesquad-scraper-worker/app
                   image_tag: ${{ github.sha }}
-                  build_extra_args: '&& cp /github/home/.docker $GITHUB_WORKSPACE/'
 
             - name: Update deployment file
               env:
                   TAG: ${{ github.sha }}
                   ENVKEY: ${{ secrets.ENVKEY  }}
                   NPM_TOKEN: ${{ secrets.GH_TOKEN }}
+                  # Base64 encoded string of $HOME/.docker/config.json
+                  DOCKER_CONFIG: ${{ secrets.DOCKER_CONFIG }}
                   NODE_ENV: production
 
               run: |
@@ -34,7 +35,7 @@ jobs:
                   sed -i 's|<ENVKEY>|'${ENVKEY}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<NODE_ENV>|'${NODE_ENV}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<NPM_TOKEN>|'${NPM_TOKEN}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
-                  sed -i 's|<DOCKER_CONFIG>|'$(base64 $GITHUB_WORKSPACE/.docker/config.json)'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+                  sed -i 's|<DOCKER_CONFIG>|'${DOCKER_CONFIG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
 
             - name: Save DigitalOcean kubeconfig
               uses: digitalocean/action-doctl@v1.4.1
