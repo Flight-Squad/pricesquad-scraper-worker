@@ -23,6 +23,7 @@ jobs:
           NODE_ENV: staging
 
         run: |
+          echo "Hi"
           sed -i 's|<ENVKEY>|'${ENVKEY}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
           sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
           sed -i 's|<NODE_ENV>|'${NODE_ENV}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
