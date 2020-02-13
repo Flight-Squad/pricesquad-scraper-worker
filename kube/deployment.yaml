@@ -23,6 +23,8 @@ spec:
                         value: <ENVKEY>
                       - name: NODE_ENV
                         value: <NODE_ENV>
+                      - name: NPM_TOKEN
+                        value: <NPM_TOKEN>
                   ports:
                       - containerPort: 80
                         name: http

@@ -27,12 +27,14 @@ jobs:
               env:
                   TAG: ${{ github.sha }}
                   ENVKEY: ${{ secrets.ENVKEY  }}
+                  NPM_TOKEN: ${{ secrets.GH_TOKEN }}
                   NODE_ENV: staging
 
               run: |
                   sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<ENVKEY>|'${ENVKEY}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<NODE_ENV>|'${NODE_ENV}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+                  sed -i 's|<NPM_TOKEN>|'${NPM_TOKEN}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
 
             - name: Save DigitalOcean kubeconfig
               uses: digitalocean/action-doctl@v1.4.1
