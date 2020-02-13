@@ -35,7 +35,7 @@ jobs:
                   sed -i 's|<ENVKEY>|'${ENVKEY}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<NODE_ENV>|'${NODE_ENV}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<NPM_TOKEN>|'${NPM_TOKEN}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
-                  sed -i 's|<DOCKER_CONFIG>|'$(base64 $GITHUB_WORKSPACE/.docker/config.json)'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+                  sed -i 's|<DOCKER_CONFIG>|'$(base64 $HOME/.docker/config.json)'|' $GITHUB_WORKSPACE/kube/deployment.yaml
 
             - name: Save DigitalOcean kubeconfig
               uses: digitalocean/action-doctl@v1.4.1
