@@ -28,12 +28,11 @@ jobs:
                   TAG: ${{ github.sha }}
                   ENVKEY: ${{ secrets.ENVKEY  }}
                   NPM_TOKEN: ${{ secrets.GH_TOKEN }}
-                  # Base64 encoded string of $HOME/.docker/config.json
                   DOCKER_CONFIG: ${{ secrets.DOCKER_CONFIG }}
                   NODE_ENV: staging
 
               run: |
-                  sed -i 's|<ENVKEY>|'${ENVKEY}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
+                  sed -i 's|<ENVKEY>|hi|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<IMAGE>|docker.pkg.github.com/flight-squad/pricesquad-scraper-worker/app:'${TAG}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<NODE_ENV>|'${NODE_ENV}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
                   sed -i 's|<NPM_TOKEN>|'${NPM_TOKEN}'|' $GITHUB_WORKSPACE/kube/deployment.yaml
