@@ -78,7 +78,7 @@ RUN mkdir -p /var/app
 WORKDIR /var/app
 ADD . /var/app
 
-RUN yarn install
+RUN npm install
 RUN chmod 777 /startup.sh
 # RUN ls -al /
 RUN /startup.sh
