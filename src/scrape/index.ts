@@ -1,14 +1,41 @@
-import { IMessageBody } from "data/queue/message/body";
-import { SearchProviders } from "data/flight/search/providers";
-import scrapeGoogle from "./google";
+import scrapeGoogle from './google';
+import { ProviderResults, SearchProviders, TripScraperQuery } from '@flight-squad/admin';
+import logger from 'config/winston';
+import { EmptyResults } from './emptyResults';
 
-const providerNotImplemented = new Error('Provider not implemented');
+const providerNotImplemented = async (query: TripScraperQuery): Promise<ProviderResults> => {
+    logger.warn(`Returning empty results for unimplemented provider '${query.provider}'`);
+    return EmptyResults();
+};
 
-export async function scrape(data: IMessageBody) {
-  switch (data.provider) {
-    case SearchProviders.google: return scrapeGoogle(data.params);
-    case SearchProviders.kayak: throw providerNotImplemented;
-    case SearchProviders.southwest: throw providerNotImplemented;
-    default: throw new Error('Provider not supported');
-  }
+/**
+ * Returns a function that handles errors thrown by the parameter function
+ * @param func Function to wrap error handling around
+ */
+const injectErrHandler = (
+    func: (query: TripScraperQuery) => Promise<ProviderResults>,
+): ((query: TripScraperQuery) => Promise<ProviderResults>) => {
+    return async function(query: TripScraperQuery): Promise<ProviderResults> {
+        try {
+            return await func(query);
+        } catch (err) {
+            logger.error(
+                `Error while scraping query ${JSON.stringify(query)}\n\n${JSON.stringify(
+                    err,
+                    null,
+                    2,
+                )}\nReturning Empty results.`,
+            );
+            return EmptyResults();
+        }
+    };
+};
+
+export function delegate(provider: SearchProviders): (query: TripScraperQuery) => Promise<ProviderResults> {
+    switch (provider) {
+        case SearchProviders.GoogleFlights:
+            return injectErrHandler(scrapeGoogle);
+        default:
+            return providerNotImplemented;
+    }
 }

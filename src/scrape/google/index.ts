@@ -1,37 +1,39 @@
-import { getHtml } from "./html";
-import makeUrl from "./url";
-import { getTripsFromHtml } from "./scrape";
-import { IMessageBodyParams } from "data/queue/message/params";
+import { getHtml } from './html';
+import makeUrl, { makeReturningFlightsUrl } from './url';
+import { getTripsFromHtml } from './scrape';
+import { ProviderResults, TripScraperQuery, TripGroup, Trip } from '@flight-squad/admin';
+import { scraperDebug } from 'config/debug';
+
+export const googleDebugger = scraperDebug.extend('google');
 
 /**
  * params in an object with the following
  *
  */
-async function scrapeGoogle(params: IMessageBodyParams) {
-  const processStartTime = process.hrtime();
-  const url = await makeUrl(params);
-  const listContainer = await getHtml(url);
-  const trips = await getTripsFromHtml(listContainer);
+async function scrapeGoogle(query: TripScraperQuery): Promise<ProviderResults> {
+    const url = await makeUrl(query);
+    const listContainer = await getHtml(url);
+    let trips = await getTripsFromHtml(query, query.departDate, listContainer);
 
-  const processEndTime = process.hrtime(processStartTime);
+    if (query.isRoundTrip) {
+        trips = trips.sort(TripGroup.SortPriceAsc);
+        googleDebugger('========================');
+        const returnFlightsUrl = await makeReturningFlightsUrl(query, trips[0].stops);
+        googleDebugger('Returning Flights Url', returnFlightsUrl);
+        // console.log('Returning Flights Url', returnFlightsUrl);
+        const html = await getHtml(returnFlightsUrl);
+        const returnFlights: Trip[] = (await getTripsFromHtml(query, query.returnDate, html)).sort(
+            TripGroup.SortPriceAsc,
+        );
+        trips.forEach(trip => trip.stops.push(...returnFlights[0].stops));
+    }
 
-  return {
-    time: processEndTime,
-    data: trips,
-    url: url
-  };
+    googleDebugger(trips[0].stops);
+
+    return {
+        data: trips,
+        url: url,
+    };
 }
-
-// Keeping this for future testing
-
-// const params = {
-//   origin: 'BOS',
-//   dest: 'SFO',
-//   departDate: new Date('2019-10-01'),
-//   isRoundTrip: false,
-//   numStops: 0
-// };
-
-// scrapeGoogle(params).then(res => console.log(res))
 
 export default scrapeGoogle;

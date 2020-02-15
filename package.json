@@ -9,17 +9,25 @@
   "scripts": {
     "clean": "rm -r ./bin",
     "compile": "tsc",
+    "esm": "node -r esm -r envkey -r module-alias/register",
+    "build:check": "tsc --noEmit",
     "compile:win": "SET NODE_ENV=development&& tsc",
-    "docker": "xvfb-run -e /dev/stdout -a --server-args=\"-screen 0 1280x1028x24 -ac +extension GLX +render -nolisten unix\" npm run start",
+    "docker": "npm install && npm run docker:start",
+    "docker:start": "xvfb-run -e /dev/stdout -a --server-args=\"-screen 0 1280x1028x24 -ac +extension GLX +render -nolisten unix\" npm run start",
     "docker:debug": "DEBUG=* xvfb-run -e /dev/stdout -a --server-args=\"-screen 0 1280x1028x24 -ac +extension GLX +render -nolisten unix\" npm run start",
-    "start": "npm run compile && node -r dotenv/config ./bin/index",
+    "start": "npm run compile && node -r envkey -r module-alias/register ./bin/index",
+    "start:dev": "cross-env DEBUG=flightsquad:* npm run start",
     "start:win": "npm run compile:win && node -r dotenv/config ./bin/index",
-    "test": "npm run compile && ava",
-    "test:win": "npm run compile:win && ava",
+    "ts-mocha": "ts-mocha -r tsconfig-paths/register src/**/*.test.ts",
+    "ts-node-dev": "ts-node-dev -r envkey -r tsconfig-paths/register",
+    "test": "npm run ts-mocha -- --grep @slow --invert",
+    "test:slow": "npm run ts-mocha -- --grep @slow --timeout 999999",
     "test-cover": "c8 --check-coverage --lines 100 npm run test",
-    "test-cover:win": "c8 --check-coverage --lines 100 npm run test:win"
+    "test-cover:win": "c8 --check-coverage --lines 100 npm run test:win",
+    "lint:fix": "eslint --fix ./src/**/*.ts"
   },
   "dependencies": {
+    "@flight-squad/admin": "0.0.48",
     "@types/app-root-path": "^1.2.4",
     "@types/express": "^4.17.1",
     "@types/morgan": "^1.7.37",
@@ -32,9 +40,13 @@
     "c8": "^5.0.4",
     "cheerio": "^1.0.0-rc.3",
     "currency-formatter": "^1.5.5",
+    "date-fns": "^2.9.0",
+    "debug": "^4.1.1",
     "dotenv": "^8.1.0",
+    "envkey": "^1.2.7",
     "esm": "^3.2.25",
     "express": "^4.17.1",
+    "logfmt": "^1.3.2",
     "module-alias": "^2.2.1",
     "moment-timezone": "^0.5.26",
     "morgan": "^1.9.1",
@@ -51,6 +63,22 @@
     "tests": "./bin/tests"
   },
   "devDependencies": {
-    "ts-node": "^8.4.1"
+    "@types/chai": "^4.2.8",
+    "@types/cheerio": "^0.22.16",
+    "@types/mocha": "^5.2.7",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "chai": "^4.2.0",
+    "cross-env": "^6.0.3",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "husky": "^4.0.7",
+    "mocha": "^7.0.0",
+    "prettier": "^1.19.1",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.6.2",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "tsconfig-paths": "^3.9.0"
   }
 }

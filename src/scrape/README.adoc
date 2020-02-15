@@ -1,0 +1,48 @@
+= Scrapers
+
+== File Structure
+
+```
+~/flightsquad/pricesquad-scraper-worker/src/scrape                                                              [19:51:01]
+> $ tree
+.
+├── README.adoc # Documentation
+├── google # Provider
+│   ├── __tests__ # Provider Tests
+│   │   ├── google.integration.test.ts
+│   │   ├── google.oneway.nonstop.html
+│   │   └── google.unit.test.ts
+│   ├── html.ts # 3. Retrieves HTML from url
+│   ├── index.ts # 1. Drives the data retrieval process
+│   ├── scrape.ts # 4. Scrapes the retrieved html
+│   └── url.ts # 2. Creates a url based on parameters
+├── index.ts # Delegates incoming request to one Provider
+└── southwest
+    ├── html.ts
+    ├── index.ts
+    ├── scrape.ts
+    └── url.ts
+
+5 directories, 15 files
+```
+
+NOTE: Ignore the `kayak` and `skiplagged` directory structure.
+The only reason they're still in the repo is to expedite some of your development
+with prior code.
+
+Each subfolder contains code for retrieving data from a search `Provider` (e.g google flights, southwest).
+
+The contents of each provider's dir should be as follows:
+
+`index.ts` -> The entry point and the logic driver. Kind of like your `main` method for the scraping unit.
+Should export 1 async function with a name formatted as `scrape{PROVIDER_NAME}` (e.g `scrapeGoogle`). This unit is used in `src/scrape/index.ts` to drive scraping for a given provider.
+
+`url.ts` -> Creates and returns a url based on the parameters passed to `index.ts` driver above.
+
+TIP: For url formatting, see For formatting, see
+https://docs.google.com/spreadsheets/d/1dMOXLWH9Ge26cbnkURsycgkNgrC_e16fQySwysa0Vho/edit?usp=sharing
+
+`html.ts` -> Wait for and retrieve HTML (from the generated url) to scrape. The challenge is finding the appropriate element to `wait` for. Ideally, you want to just wait until the `div` containing the price renders, but for some providers, prices load dynamically, and you have to get creative to wait for something.
+
+`scrape.ts` -> contains logic for scraping. See `cheerio` documention for details on how to use it. Return an object with an array of trip objects, Pujit will take care of normalizing data formats after you finish the scraper.
+
