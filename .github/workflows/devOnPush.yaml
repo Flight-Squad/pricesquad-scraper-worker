@@ -1,18 +1,18 @@
-name: Deploy to kubernetes
+name: Push Docker Image to ECR
 on:
     push:
         branches:
-            - dev
+            - '**'
+        branches-ignore:
+            - master
 
 jobs:
     build:
         name: Build & Push to AWS ECR
         runs-on: ubuntu-18.04
         steps:
-            - name: Checkout `dev`
+            - name: Checkout repo
               uses: actions/checkout@v2
-              with:
-                  ref: dev
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
