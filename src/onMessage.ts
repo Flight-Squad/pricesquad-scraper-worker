@@ -11,8 +11,8 @@ const findProvider = (prov: string): SearchProviders | never => {
     throw new Error(`Search Provider '${prov}' not found.`);
 };
 
-export async function onMessage(message: SQSMessage): Promise<void> {
-    const query: TripScraperQuery = JSON.parse(message.Body);
+export async function onMessage(message): Promise<void> {
+    const query: TripScraperQuery = message;
     const group = await DB.find(TripGroup.Collection, query.group, TripGroup);
     const provider = findProvider(query.provider);
     const scrape = delegate(provider);
