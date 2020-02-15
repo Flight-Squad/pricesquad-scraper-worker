@@ -1,85 +1,48 @@
-# Built with arch: amd64 flavor: lxde image: ubuntu:18.04
-#
-################################################################################
-# base system
-################################################################################
+# Based on https://hub.docker.com/r/buildkite/puppeteer/dockerfile
 
-FROM ubuntu:18.04 as system
-LABEL maintainer="pmehrotra2@babson.edu"
+FROM node:13.8 as base
 
-#=====================
-# Dependencies
-#=====================
+ARG NPM_REG_CRED
+ENV NPM_TOKEN=${NPM_REG_CRED}
 
-RUN sed -i 's#http://archive.ubuntu.com/ubuntu/#mirror://mirrors.ubuntu.com/mirrors.txt#' /etc/apt/sources.list;
-
-
-# built-in packages
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt update \
-  && apt install -y --no-install-recommends software-properties-common curl apache2-utils \
-  && apt update \
-  && apt install -y --no-install-recommends --allow-unauthenticated \
-  supervisor nginx sudo net-tools zenity xz-utils \
-  dbus-x11 x11-utils alsa-utils \
-  mesa-utils libgl1-mesa-dri \
-  && apt autoclean -y \
-  && apt autoremove -y \
-  && rm -rf /var/lib/apt/lists/*
-# install debs error if combine together
-RUN add-apt-repository -y ppa:fcwu-tw/apps \
-  && apt update \
-  && apt install -y --no-install-recommends --allow-unauthenticated \
-  xvfb x11vnc=0.9.16-1 \
-  vim-tiny firefox chromium-browser ttf-ubuntu-font-family ttf-wqy-zenhei  \
-  && add-apt-repository -r ppa:fcwu-tw/apps \
-  && apt autoclean -y \
-  && apt autoremove -y \
-  && rm -rf /var/lib/apt/lists/*
-
-RUN apt update \
-  && apt install -y --no-install-recommends --allow-unauthenticated \
-  lxde gtk2-engines-murrine gnome-themes-standard gtk2-engines-pixbuf gtk2-engines-murrine arc-theme \
-  && apt autoclean -y \
-  && apt autoremove -y \
-  && rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends curl ca-certificates gnupg patch libgconf-2-4
-
-# nodejs
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
-  && apt-get install -y nodejs
-
-# Additional packages require ~600MB
-# libreoffice  pinta language-pack-zh-hant language-pack-gnome-zh-hant firefox-locale-zh-hant libreoffice-l10n-zh-tw
-
-# tini to fix subreap
-ARG TINI_VERSION=v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/tini
-RUN chmod +x /bin/tini
-
-#=====================
-# Program
-#=====================
-ADD rootfs /
-
-# EXPOSE doesn't actually expose the port, and it could confuse some cloud providers
-EXPOSE 80
+RUN  apt-get update \
+  # Install latest chrome dev package, which installs the necessary libs to
+  # make the bundled version of Chromium that Puppeteer installs work.
+  && apt-get install -y wget --no-install-recommends \
+  && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+  && apt-get update \
+  && apt-get install -y google-chrome-unstable --no-install-recommends \
+  && rm -rf /var/lib/apt/lists/* \
+  && wget --quiet https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /usr/sbin/wait-for-it.sh \
+  && chmod +x /usr/sbin/wait-for-it.sh
 
 RUN mkdir -p /var/app
-WORKDIR /var/app
 ADD . /var/app
+WORKDIR /var/app
+RUN rm -rf .git
+RUN npm ci
+RUN npm run compile
 
-# Install at runtime instead
-# RUN npm install
+# Inject binaries into final image
 
-RUN chmod 777 /startup.sh
-# RUN ls -al /
-RUN /startup.sh
-CMD [ "npm", "run", "docker" ]
-# ENV HOME=/home/ubuntu \
-#     SHELL=/bin/bash
+FROM node:13.8 as final
 
-# ENTRYPOINT ["/startup.sh"]
+RUN  apt-get update \
+  # Install latest chrome dev package, which installs the necessary libs to
+  # make the bundled version of Chromium that Puppeteer installs work.
+  && apt-get install -y wget --no-install-recommends \
+  && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+  && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+  && apt-get update \
+  && apt-get install -y google-chrome-unstable --no-install-recommends \
+  && rm -rf /var/lib/apt/lists/* \
+  && wget --quiet https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /usr/sbin/wait-for-it.sh \
+  && chmod +x /usr/sbin/wait-for-it.sh
 
+RUN mkdir -p /var/app
+COPY --from=base /var/app /var/app
+
+WORKDIR /var/app
+
+CMD [ "npm", "run", "start" ]

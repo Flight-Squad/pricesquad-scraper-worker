@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build -t flight-squad/pricesquad-scraper-worker .
-docker run -p 80:80 -e AWS_SECRET_ACCESS_KEY -e AWS_ACCESS_KEY_ID -e PRICESQUAD_API -e AWS_QUEUE -e AWS_QUEUE_REGION -d flight-squad/pricesquad-scraper-worker
+docker build --build-arg NPM_REG_CRED=${NPM_TOKEN} -t flight-squad/pricesquad-scraper-worker .
+docker run -p 80:80 -e ENVKEY -e PORT -d flight-squad/pricesquad-scraper-worker
