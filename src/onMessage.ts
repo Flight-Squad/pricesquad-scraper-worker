@@ -23,5 +23,5 @@ export async function onMessage(message): Promise<void> {
     const res: ProviderResults = await scrape(query);
     logger.info('Scraped Message');
     logger.debug(JSON.stringify(res));
-    await onResult(await group.addProvider(provider, res));
+    await onResult(await (await group.addProvider(provider, res)).refresh(TripGroup));
 }
