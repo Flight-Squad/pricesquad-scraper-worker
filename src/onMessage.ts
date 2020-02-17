@@ -2,7 +2,6 @@ import { TripScraperQuery, ProviderResults, TripGroup, SearchProviders } from '@
 import logger from 'config/winston';
 import { DB } from 'config/database';
 import { onResult } from './onResult';
-import { SQSMessage } from 'config/aws';
 import { delegate } from './scrape';
 
 const findProvider = (prov: string): SearchProviders | never => {
@@ -17,12 +16,9 @@ export async function onMessage(message): Promise<void> {
     const provider = findProvider(query.provider);
     const scrape = delegate(provider);
 
-    // Commented out because this can/should be handled more succinctly and scalably
-    // if (process.env.NODE_ENV === 'debug' || process.env.NODE_ENV === 'development') {
-    logger.debug(`Processing ${message.MessageId}`);
-    // }
+    logger.debug('Processing Message');
 
-    const res: ProviderResults = await scrape(query); // interfaces?
+    const res: ProviderResults = await scrape(query);
+    logger.debug(JSON.stringify(res));
     await onResult(await group.addProvider(provider, res));
-    logger.info(`[FINISHED] Processed ${message.MessageId}`);
 }

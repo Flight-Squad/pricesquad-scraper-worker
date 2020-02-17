@@ -38,8 +38,8 @@ const informCustomerOnResult: ResultHandler = async (group: TripGroup): Promise<
     let search: FlightSearch = await group.finish();
     console.log(`searchExists=${Boolean(search)}`);
     if (Boolean(search)) console.log(`searchIsDone=${search.isDone()}`);
-    console.log(group.isDone());
-    console.log(group.providers);
+    console.log('Group is Done:', group.isDone());
+    console.log('Group Providers:', group.providers);
     if (search && search.isDone()) {
         search = await search.updateStatus(FlightSearchStatus.Done);
         const bestTrip = await search.bestTrip();
@@ -53,6 +53,7 @@ const informCustomerOnResult: ResultHandler = async (group: TripGroup): Promise<
                 message:
                     'We ran into a few hiccups trying to find the best flight for you. A human should reach out to help you shortly.',
             });
+            console.log('No Trip found in search results!');
             return;
         }
         const strategy = await discountStrategy(search);
@@ -77,7 +78,8 @@ const informCustomerOnResult: ResultHandler = async (group: TripGroup): Promise<
             query: group.query,
         });
         // Temporary, just for visual testing via terminal
-        console.log(bestTrip);
+        console.log('Best trip found:', bestTrip);
+        console.log('Finished Search Request', search.id);
     }
 };
 
