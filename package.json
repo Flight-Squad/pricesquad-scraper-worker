@@ -27,7 +27,7 @@
     "lint:fix": "eslint --fix ./src/**/*.ts"
   },
   "dependencies": {
-    "@flight-squad/admin": "0.0.48",
+    "@flight-squad/admin": "0.1.6",
     "@types/app-root-path": "^1.2.4",
     "@types/express": "^4.17.1",
     "@types/morgan": "^1.7.37",
