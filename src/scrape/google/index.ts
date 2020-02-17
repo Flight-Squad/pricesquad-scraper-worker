@@ -12,8 +12,11 @@ export const googleDebugger = scraperDebug.extend('google');
  */
 async function scrapeGoogle(query: TripScraperQuery): Promise<ProviderResults> {
     const url = await makeUrl(query);
+    googleDebugger('url', url);
     const listContainer = await getHtml(url);
+    googleDebugger('Got HTML');
     let trips = await getTripsFromHtml(query, query.departDate, listContainer);
+    googleDebugger('Got Trips');
 
     if (query.isRoundTrip) {
         trips = trips.sort(TripGroup.SortPriceAsc);
@@ -22,10 +25,12 @@ async function scrapeGoogle(query: TripScraperQuery): Promise<ProviderResults> {
         googleDebugger('Returning Flights Url', returnFlightsUrl);
         // console.log('Returning Flights Url', returnFlightsUrl);
         const html = await getHtml(returnFlightsUrl);
+        googleDebugger('Got HTML');
         const returnFlights: Trip[] = (await getTripsFromHtml(query, query.returnDate, html)).sort(
             TripGroup.SortPriceAsc,
         );
         trips.forEach(trip => trip.stops.push(...returnFlights[0].stops));
+        googleDebugger('Got Trips');
     }
 
     googleDebugger(trips[0].stops);
