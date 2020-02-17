@@ -4,3 +4,6 @@ export async function cleanup(browser: puppeteer.Browser, page?: puppeteer.Page)
     if (page) await page.close();
     await browser.close();
 }
+
+export const newBrowser = (): Promise<puppeteer.Browser> =>
+    puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
