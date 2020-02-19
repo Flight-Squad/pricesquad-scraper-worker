@@ -1,5 +1,4 @@
 import { ProviderResults, TripGroup, SearchProviders, Firebase, ConfiguredScraperQuery } from '@flight-squad/admin';
-import logger from './config/winston';
 import { makeResultHandler } from './onResult';
 import { delegate } from './scrape';
 import { scraperDebug } from './config/debug';
@@ -18,11 +17,12 @@ export function makeQueryHandler(DB: Firebase) {
         scraperDebug('Found Matching Search Provider:', provider);
         const scrape = delegate(provider);
 
-        logger.debug('Processing Message');
         const res: ProviderResults = await scrape(query);
-        logger.info('Scraped Message');
-        logger.debug(JSON.stringify(res));
+        console.debug('Scraped Message:', res);
+
         const onResult = makeResultHandler(query.config);
-        await onResult(await (await group.addProvider(provider, res)).refresh(TripGroup));
+        let resultGroup = await group.addProvider(provider, res);
+        resultGroup = await resultGroup.refresh(TripGroup);
+        await onResult(resultGroup);
     };
 }
