@@ -6,7 +6,6 @@ import {
     Trip,
     Customer,
     Chatsquad,
-    PricingStrategyConfig,
     Discount,
     ValidPricingStrategyConfig,
     QueryConfig,
@@ -14,10 +13,11 @@ import {
 } from '@flight-squad/admin';
 
 async function discountStrategy(search: FlightSearch, config: QueryConfig): Promise<ValidPricingStrategyConfig> {
-    const { businessStrategy } = config;
-    const cfg = new PricingStrategyConfig(businessStrategy.doc, businessStrategy.sheetNames.discount, search.db);
-    await cfg.load();
-    return cfg.strategy();
+    return {
+        '100': '0.99',
+        '200': '0.95',
+        '600': '0.85',
+    };
 }
 
 /**

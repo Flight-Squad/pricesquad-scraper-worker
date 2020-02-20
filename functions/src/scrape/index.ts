@@ -1,10 +1,9 @@
 import scrapeGoogle from './google';
 import { ProviderResults, SearchProviders, TripScraperQuery } from '@flight-squad/admin';
 import { EmptyResults } from './emptyResults';
-import logger from '../config/winston';
 
 const providerNotImplemented = async (query: TripScraperQuery): Promise<ProviderResults> => {
-    logger.warn(`Returning empty results for unimplemented provider '${query.provider}'`);
+    console.log(`Returning empty results for unimplemented provider '${query.provider}'`);
     return EmptyResults();
 };
 
@@ -19,13 +18,16 @@ const injectErrHandler = (
         try {
             return await func(query);
         } catch (err) {
-            logger.error(
+            console.log(
                 `Error while scraping query ${JSON.stringify(query)}\n\n${JSON.stringify(
                     err,
                     null,
                     2,
                 )}\nReturning Empty results.`,
             );
+            console.error(err.name);
+            console.error(err.message);
+            console.error(err.stack);
             return EmptyResults();
         }
     };

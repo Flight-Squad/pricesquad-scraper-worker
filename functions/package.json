@@ -16,13 +16,14 @@
     },
     "main": "lib/index.js",
     "dependencies": {
-        "@flight-squad/admin": "^0.2.2",
+        "@flight-squad/admin": "^0.2.3",
         "cheerio": "^1.0.0-rc.3",
         "chrome-aws-lambda": "^2.1.1",
         "currency-formatter": "^1.5.5",
         "date-fns": "^2.9.0",
         "firebase-admin": "^8.6.0",
         "firebase-functions": "^3.3.0",
+        "iltorb": "^2.4.5",
         "puppeteer-core": "^2.1.1",
         "winston": "^3.2.1"
     },

@@ -11,14 +11,15 @@ const findProvider = (prov: string): SearchProviders | never => {
 
 export function makeQueryHandler(DB: Firebase) {
     return async function onQuery(query: ConfiguredScraperQuery): Promise<void> {
-        const group = await DB.find(TripGroup.Collection, query.group, TripGroup);
-        scraperDebug('Found group:', group.data());
+        const group = await TripGroup.find(DB, query.group);
+        console.log('Found group:', group.data());
         const provider = findProvider(query.provider);
         scraperDebug('Found Matching Search Provider:', provider);
         const scrape = delegate(provider);
 
         const res: ProviderResults = await scrape(query);
-        console.debug('Scraped Message:', res);
+        console.log('Scraped Message:');
+        console.log(res);
 
         const onResult = makeResultHandler(query.config);
         let resultGroup = await group.addProvider(provider, res);

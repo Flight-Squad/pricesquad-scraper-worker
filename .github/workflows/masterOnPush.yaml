@@ -1,0 +1,26 @@
+name: Deploy to Cloud Functions
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    build:
+        name: Deploy
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout master
+              uses: actions/checkout@v1
+
+            - name: Update .npmrc
+              env:
+                  NPM_TOKEN: ${{ secrets.GH_TOKEN }}
+
+              run: sed -i 's|${NPM_TOKEN}|'${NPM_TOKEN}'|' $GITHUB_WORKSPACE/functions/.npmrc
+
+            - name: Deploy to Firebase
+              uses: w9jds/firebase-action@master
+              with:
+                  args: deploy --only functions
+              env:
+                  FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
